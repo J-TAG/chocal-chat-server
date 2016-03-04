@@ -1,5 +1,5 @@
 import QtQuick 2.5
-import QtQuick.Layouts 1.2
+import QtGraphicalEffects 1.0
 
 Item {
     id: itm
@@ -9,7 +9,7 @@ Item {
 
     Row {
         id: layout
-        spacing: 40
+        spacing: 20
 
         populate:Transition {
             // Fade in animation
@@ -30,19 +30,42 @@ Item {
         }
         // End populate transitions
 
-        // Avatar image
+        // Avatar item
         Item {
             id: itmImage
 
-            height: 40
-            width: 40
-            // TODO : Place avatar image here
-            Text {
-                text: "IMG"
-            }
+            height: 60
+            width: 70
 
+            // Avatar image
+            Image {
+                id: imgAvatar
+                height: 60
+                width: 60
+                y: -10
+                x: 10
+
+                fillMode: Image.PreserveAspectCrop
+                source: avatar
+
+                // Circle effect
+                layer.enabled: true
+                layer.effect: OpacityMask {
+                    maskSource: Item {
+                        width: imgAvatar.width
+                        height: imgAvatar.height
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: Math.min(imgAvatar.width, imgAvatar.height)
+                            height: width
+                            radius: Math.min(width, height)
+                        }
+                    }
+                }
+            }
+            // End avatar image
         }
-        // End avatar image
+        // End avatar item
 
         // Text item
         Item {
@@ -56,6 +79,7 @@ Item {
                 id: txtName
                 text: name
                 color: "#ea8627"
+                font.bold: true
             }
 
             // Message content
@@ -78,13 +102,13 @@ Item {
 
                 anchors {
                     top: txtName.top
-                    topMargin: -20
+                    topMargin: -10
                     bottom: txtMessage.bottom
-                    bottomMargin: -20
+                    bottomMargin: -10
                     right: txtMessage.right
-                    rightMargin: -20
+                    rightMargin: -10
                     left: txtName.left
-                    leftMargin: -20
+                    leftMargin: -10
                 }
 
                 z: -1

@@ -32,7 +32,7 @@ ApplicationWindow {
                 text: "Send 1"
                 onClicked: {
                     appendTextMessage({name: "Sam Wise",
-                                          message: "Hey There"})
+                                          message: "Hey There", avatar: getAvatar()})
                 }
 
             }
@@ -40,7 +40,11 @@ ApplicationWindow {
                 text: "Send 2"
                 onClicked: {
                     appendTextMessage({name: "John Brown",
-                                          message: "This is a realy realy realy realy realy realy realy realy realy realy realy realy realy long message"})
+                                          message: "Lorem ipsum dolor sit amet, ex vis vocent persius moderatius, est ne quando omnium invenire. Eius habeo disputationi quo ad. Ei nec modus eleifend. Laboramus maiestatis pro eu. An vel elitr scripta oblique, dicam aliquip mea ad, libris altera ad duo.
+
+Et quo nisl tota, mei in eros mundi ludus, id omnis dicant intellegebat his. Ex reprimique honestatis est, quidam melius consequuntur eum at, nam no modo accusata invenire. Ex commodo eruditi moderatius vel. Ea brute congue complectitur has. Mea solum epicuri patrioque in, sea cu rebum viris gloriatur, in choro veniam scriptorem eum. Vel eu omnesque electram, no sit dolor patrioque.
+
+Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate reprimique reformidans. Has nusquam iudicabit ei. Doming omnesque cotidieque an sea, erat feugait euripidis id cum. Nec te dicit homero scripserit, ex his numquam docendi, no sint dicta everti pri. Ut adhuc civibus officiis vim. Vel in sanctus periculis, eu ullum torquatos sed.", avatar: getAvatar()})
                 }
             }
 
@@ -59,15 +63,36 @@ ApplicationWindow {
     WebSocketServer {
         id: server
         listen: true
+        host: "192.168.1.12"
+        port: 36911
+
         onClientConnected: {
+
+            console.warn("New client connected:", webSocket.toString())
+
             webSocket.onTextMessageReceived.connect(function(message) {
-                appendTextMessage({name: "unknown", message: qsTr("Server received message: %1").arg(message)});
-                webSocket.sendTextMessage({name: "server", message:qsTr("Hello Client!")});
+
+                console.warn("Client", webSocket.toString(), "said:", message)
+
+                appendTextMessage({
+                                      name: qsTr("Unknown"),
+                                      message: message,
+                                      avatar: getAvatar()
+                                  });
+                webSocket.sendTextMessage({
+                                              name: qsTr("Server"),
+                                              message:qsTr("Hello Client!")
+                                          });
             });
         }
+
         onErrorStringChanged: {
-            appendMessage({name:"error", message:qsTr("Server error: %1").arg(errorString)});
+            appendTextMessage({
+                                  name:qsTr("Error"),
+                                  message:qsTr("Server error: %1").arg(errorString)
+                              });
         }
+
     }
     // End web socket server
 
@@ -80,7 +105,7 @@ ApplicationWindow {
             right: parent.right
             left: parent.left
         }
-        height: 60
+        height: 80
 
         z: 2
 
@@ -96,6 +121,21 @@ ApplicationWindow {
             text: qsTr("Chocal Server")
         }
         // End title label
+
+        // Status text
+        Text {
+            id: txtStatus
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: lblTitle.bottom
+                topMargin: 10
+            }
+
+            text: qsTr("Listening on: %1").arg(server.url)
+        }
+        // End status text
+
 
     }
     // End header area
@@ -120,5 +160,13 @@ ApplicationWindow {
 
     }
     // End chat area
+
+    // Functions
+
+    // Get avatar path by id
+    function getAvatar(websocket) {
+        // TODO : Return avatar image path by websocket id
+        return "qrc:/img/img/no-avatar.png"
+    }
 
 }
