@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>MessageDelegate.qml</file>
+        <file>UserDelegate.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file>img/background.jpg</file>

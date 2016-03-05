@@ -6,40 +6,14 @@ import QtWebSockets 1.0
 ApplicationWindow {
     id: main
     visible: true
-    width: 600
-    height: 400
+    width: 900
+    height: 500
 
-    property var user_keys: []
-    property var sockets: []
-
-    function gotoLast() {
-        messageView.positionViewAtEnd()
+    // User model
+    ListModel {
+        id: userModel
     }
-
-    function appendStaticTextMessage(json) {
-        messageModel.append(json)
-        gotoLast()
-    }
-
-    function appendTextMessage(sender, message) {
-        messageModel.append({
-                                type: "plain",
-                                name: qsTr("Unknown"),
-                                message: message,
-                                avatar: getAvatar(Qt.btoa(sender))
-                            })
-        gotoLast()
-    }
-
-    function appendInfoMessage(message) {
-        messageModel.append({
-                                type: "info",
-                                name: "",
-                                message: message,
-                                avatar: ""
-                            })
-        gotoLast()
-    }
+    // End user model
 
     // Message model
     ListModel {
@@ -54,23 +28,36 @@ ApplicationWindow {
             ToolButton {
                 text: "Send 1"
                 onClicked: {
-                    appendStaticTextMessage({type: "plain",
+                    appendTextMessage(0, {type: "plain",
                                                 name: "Sam Wise",
-                                                message: "Hey There", avatar: getAvatar()})
+                                                message: "Hey There",
+                                                user_key: "key"})
                 }
 
             }
             ToolButton {
                 text: "Send 2"
                 onClicked: {
-                    appendStaticTextMessage({type: "plain",
+                    appendTextMessage(0, {type: "plain",
                                                 name: "John Brown",
                                                 message: "Lorem ipsum dolor sit amet, ex vis vocent persius moderatius, est ne quando omnium invenire. Eius habeo disputationi quo ad. Ei nec modus eleifend. Laboramus maiestatis pro eu. An vel elitr scripta oblique, dicam aliquip mea ad, libris altera ad duo.
 
 Et quo nisl tota, mei in eros mundi ludus, id omnis dicant intellegebat his. Ex reprimique honestatis est, quidam melius consequuntur eum at, nam no modo accusata invenire. Ex commodo eruditi moderatius vel. Ea brute congue complectitur has. Mea solum epicuri patrioque in, sea cu rebum viris gloriatur, in choro veniam scriptorem eum. Vel eu omnesque electram, no sit dolor patrioque.
 
-Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate reprimique reformidans. Has nusquam iudicabit ei. Doming omnesque cotidieque an sea, erat feugait euripidis id cum. Nec te dicit homero scripserit, ex his numquam docendi, no sint dicta everti pri. Ut adhuc civibus officiis vim. Vel in sanctus periculis, eu ullum torquatos sed.", avatar: getAvatar()})
+Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate reprimique reformidans. Has nusquam iudicabit ei. Doming omnesque cotidieque an sea, erat feugait euripidis id cum. Nec te dicit homero scripserit, ex his numquam docendi, no sint dicta everti pri. Ut adhuc civibus officiis vim. Vel in sanctus periculis, eu ullum torquatos sed.",
+                                                user_key: "key"})
                 }
+            }
+
+            ToolButton {
+                text: "Send 3"
+                onClicked: {
+                    sendTextMessage(0, {type: "plain",
+                                        name: "Sam Wise",
+                                        message: "Hey There",
+                                        user_key: "key"})
+                }
+
             }
 
         }
@@ -93,32 +80,26 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
 
         onClientConnected: {
 
-            var user_key = Qt.btoa(webSocket.toString())
-
-            user_keys.push(user_key)
-            sockets[user_key] = webSocket
-
-            console.warn("New client connected:", user_key)
-            appendInfoMessage(qsTr("New client %1 now connected").arg(user_key))
+            console.warn("New client connected:", Qt.btoa(webSocket))
 
             webSocket.onTextMessageReceived.connect(function(message) {
 
-                console.warn("Client", Qt.btoa(webSocket.toString()), "said:", message);
+                var json = JSON.parse(message)
 
-                appendTextMessage(webSocket, message);
+                if(json.type === "register") {
+                    // First message after socket connection
+                    newClient(webSocket, json)
+                    appendInfoMessage(qsTr("New client %1 now connected").arg(json.name))
+                }
 
-                webSocket.sendTextMessage(JSON.stringify({
-                                                             name: qsTr("Server"),
-                                                             message:qsTr("Hello Client!")
-                                                         }));
+                if(json.type === "plain") {
+                    sendTextMessage(webSocket, json)
+                }
             });
         }
 
         onErrorStringChanged: {
-            appendStaticTextMessage({
-                                        name:qsTr("Error"),
-                                        message:qsTr("Server error: %1").arg(errorString)
-                                    });
+            appendInfoMessage(qsTr("Server error: %1").arg(errorString))
         }
 
     }
@@ -135,7 +116,7 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
         }
         height: 80
 
-        z: 2
+        z: 4
 
         // Title label
         Label {
@@ -168,17 +149,37 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
     }
     // End header area
 
-
-    // Chat area
+    // Users area
     ListView {
-        id: messageView
+        id: userView
+
         anchors {
             top: rectHeader.bottom
             bottom: parent.bottom
             left: parent.left
-            right: parent.right
+        }
+        z: 2
+        width: main.width / 4
+
+        model: userModel
+
+        delegate: UserDelegate{}
+
+    }
+    // End users area
+
+    // Chat area
+    ListView {
+        id: messageView
+
+        anchors {
+            top: rectHeader.bottom
+            bottom: parent.bottom
+            left: userView.right
+            right: rectSettings.left
             topMargin: 40
         }
+        z: 3
 
         spacing: 40
 
@@ -187,10 +188,64 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
         delegate: MessageDelegate{}
 
     }
-
     // End chat area
 
+    // Settings area
+    Rectangle {
+        id: rectSettings
+
+        anchors {
+            top: rectHeader.bottom
+            bottom: parent.bottom
+            right: parent.right
+        }
+        z: 2
+        width: main.width / 4
+
+        color: "blue"
+    }
+    // End settings area
+
     // Functions
+
+    function gotoLast() {
+        messageView.positionViewAtEnd()
+    }
+
+    function appendTextMessage(sender, json) {
+        messageModel.append(json)
+        gotoLast()
+    }
+
+    function appendInfoMessage(message) {
+        messageModel.append({
+                                type: "info",
+                                name: "",
+                                message: message,
+                                user_key: "SYSTEM"
+                            })
+        gotoLast()
+    }
+
+    function newClient(socket, json) {
+        var user_key = Qt.btoa(socket.toString())
+
+        userModel.append({
+                             socket: socket,
+                             name: json.name,
+                             user_key: user_key
+                         })
+
+        return true
+    }
+
+    function sendTextMessage(sender, json) {
+        // Send message to all users
+        appendTextMessage(sender, json)
+        for(var i = 0; i < userModel.count; ++i) {
+            userModel.get(i).socket.sendTextMessage(JSON.stringify(json));
+        }
+    }
 
     // Get avatar path by id
     function getAvatar(user_key) {

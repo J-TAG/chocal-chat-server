@@ -57,7 +57,7 @@ Item {
                     x: 10
 
                     fillMode: Image.PreserveAspectCrop
-                    source: avatar
+                    source: getAvatar(user_key)
 
                     // Circle effect
                     layer.enabled: true
@@ -101,7 +101,7 @@ Item {
                         top: txtName.bottom
                         topMargin: 10
                     }
-                    width: main.width - 200
+                    width: messageView.width - 150
 
                     wrapMode: Text.Wrap
                     text: message
@@ -141,10 +141,9 @@ Item {
     Item {
         id: itmInfoMessage
 
-        x: itmText.x
-        y: itmText.y
-        height: itmText.height
-        width: itmText.width
+        x: (messageView.width - width) / 2
+        height: txtInfo.height
+        width: txtInfo.width
 
         visible: type === "info"
 
@@ -153,7 +152,7 @@ Item {
             id: infoLayout
 
             anchors {
-                centerIn: parent
+                fill: parent
             }
 
             populate:Transition {
@@ -179,7 +178,9 @@ Item {
             Text {
                 id: txtInfo
 
-                wrapMode: Text.Wrap
+                width: messageView.width - 150
+
+                wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
                 text: message
                 color: "#eee"
