@@ -9,12 +9,35 @@ ApplicationWindow {
     width: 600
     height: 400
 
+    property var user_keys: []
+    property var sockets: []
+
     function gotoLast() {
         messageView.positionViewAtEnd()
     }
 
-    function appendTextMessage(message) {
-        messageModel.append(message)
+    function appendStaticTextMessage(json) {
+        messageModel.append(json)
+        gotoLast()
+    }
+
+    function appendTextMessage(sender, message) {
+        messageModel.append({
+                                type: "plain",
+                                name: qsTr("Unknown"),
+                                message: message,
+                                avatar: getAvatar(Qt.btoa(sender))
+                            })
+        gotoLast()
+    }
+
+    function appendInfoMessage(message) {
+        messageModel.append({
+                                type: "info",
+                                name: "",
+                                message: message,
+                                avatar: ""
+                            })
         gotoLast()
     }
 
@@ -31,16 +54,18 @@ ApplicationWindow {
             ToolButton {
                 text: "Send 1"
                 onClicked: {
-                    appendTextMessage({name: "Sam Wise",
-                                          message: "Hey There", avatar: getAvatar()})
+                    appendStaticTextMessage({type: "plain",
+                                                name: "Sam Wise",
+                                                message: "Hey There", avatar: getAvatar()})
                 }
 
             }
             ToolButton {
                 text: "Send 2"
                 onClicked: {
-                    appendTextMessage({name: "John Brown",
-                                          message: "Lorem ipsum dolor sit amet, ex vis vocent persius moderatius, est ne quando omnium invenire. Eius habeo disputationi quo ad. Ei nec modus eleifend. Laboramus maiestatis pro eu. An vel elitr scripta oblique, dicam aliquip mea ad, libris altera ad duo.
+                    appendStaticTextMessage({type: "plain",
+                                                name: "John Brown",
+                                                message: "Lorem ipsum dolor sit amet, ex vis vocent persius moderatius, est ne quando omnium invenire. Eius habeo disputationi quo ad. Ei nec modus eleifend. Laboramus maiestatis pro eu. An vel elitr scripta oblique, dicam aliquip mea ad, libris altera ad duo.
 
 Et quo nisl tota, mei in eros mundi ludus, id omnis dicant intellegebat his. Ex reprimique honestatis est, quidam melius consequuntur eum at, nam no modo accusata invenire. Ex commodo eruditi moderatius vel. Ea brute congue complectitur has. Mea solum epicuri patrioque in, sea cu rebum viris gloriatur, in choro veniam scriptorem eum. Vel eu omnesque electram, no sit dolor patrioque.
 
@@ -68,29 +93,32 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
 
         onClientConnected: {
 
-            console.warn("New client connected:", webSocket.toString())
+            var user_key = Qt.btoa(webSocket.toString())
+
+            user_keys.push(user_key)
+            sockets[user_key] = webSocket
+
+            console.warn("New client connected:", user_key)
+            appendInfoMessage(qsTr("New client %1 now connected").arg(user_key))
 
             webSocket.onTextMessageReceived.connect(function(message) {
 
-                console.warn("Client", webSocket.toString(), "said:", message)
+                console.warn("Client", Qt.btoa(webSocket.toString()), "said:", message);
 
-                appendTextMessage({
-                                      name: qsTr("Unknown"),
-                                      message: message,
-                                      avatar: getAvatar()
-                                  });
-                webSocket.sendTextMessage({
-                                              name: qsTr("Server"),
-                                              message:qsTr("Hello Client!")
-                                          });
+                appendTextMessage(webSocket, message);
+
+                webSocket.sendTextMessage(JSON.stringify({
+                                                             name: qsTr("Server"),
+                                                             message:qsTr("Hello Client!")
+                                                         }));
             });
         }
 
         onErrorStringChanged: {
-            appendTextMessage({
-                                  name:qsTr("Error"),
-                                  message:qsTr("Server error: %1").arg(errorString)
-                              });
+            appendStaticTextMessage({
+                                        name:qsTr("Error"),
+                                        message:qsTr("Server error: %1").arg(errorString)
+                                    });
         }
 
     }
@@ -156,17 +184,22 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
 
         model: messageModel
 
-        delegate: MessageDelegate {}
+        delegate: MessageDelegate{}
 
     }
+
     // End chat area
 
     // Functions
 
     // Get avatar path by id
-    function getAvatar(websocket) {
-        // TODO : Return avatar image path by websocket id
-        return "qrc:/img/img/no-avatar.png"
+    function getAvatar(user_key) {
+
+        if(user_key === undefined || user_key === null || !fileio.hasAvatar(user_key)) {
+            return "qrc:/img/img/no-avatar.png"
+        }
+
+        return "file:///" + fileio.getAvatarPath(user_key);
     }
 
 }
