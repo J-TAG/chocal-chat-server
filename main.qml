@@ -29,9 +29,9 @@ ApplicationWindow {
                 text: "Send 1"
                 onClicked: {
                     appendTextMessage(0, {type: "plain",
-                                                name: "Sam Wise",
-                                                message: "Hey There",
-                                                user_key: "key"})
+                                          name: "Sam Wise",
+                                          message: "Hey There",
+                                          user_key: "key"})
                 }
 
             }
@@ -39,13 +39,13 @@ ApplicationWindow {
                 text: "Send 2"
                 onClicked: {
                     appendTextMessage(0, {type: "plain",
-                                                name: "John Brown",
-                                                message: "Lorem ipsum dolor sit amet, ex vis vocent persius moderatius, est ne quando omnium invenire. Eius habeo disputationi quo ad. Ei nec modus eleifend. Laboramus maiestatis pro eu. An vel elitr scripta oblique, dicam aliquip mea ad, libris altera ad duo.
+                                          name: "John Brown",
+                                          message: "Lorem ipsum dolor sit amet, ex vis vocent persius moderatius, est ne quando omnium invenire. Eius habeo disputationi quo ad. Ei nec modus eleifend. Laboramus maiestatis pro eu. An vel elitr scripta oblique, dicam aliquip mea ad, libris altera ad duo.
 
 Et quo nisl tota, mei in eros mundi ludus, id omnis dicant intellegebat his. Ex reprimique honestatis est, quidam melius consequuntur eum at, nam no modo accusata invenire. Ex commodo eruditi moderatius vel. Ea brute congue complectitur has. Mea solum epicuri patrioque in, sea cu rebum viris gloriatur, in choro veniam scriptorem eum. Vel eu omnesque electram, no sit dolor patrioque.
 
 Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate reprimique reformidans. Has nusquam iudicabit ei. Doming omnesque cotidieque an sea, erat feugait euripidis id cum. Nec te dicit homero scripserit, ex his numquam docendi, no sint dicta everti pri. Ut adhuc civibus officiis vim. Vel in sanctus periculis, eu ullum torquatos sed.",
-                                                user_key: "key"})
+                                          user_key: "key"})
                 }
             }
 
@@ -80,22 +80,55 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
 
         onClientConnected: {
 
-            console.warn("New client connected:", Qt.btoa(webSocket))
-
             webSocket.onTextMessageReceived.connect(function(message) {
 
                 var json = JSON.parse(message)
+                var user_key = Qt.btoa(webSocket.toString())
 
-                if(json.type === "register") {
-                    // First message after socket connection
-                    newClient(webSocket, json)
-                    appendInfoMessage(qsTr("New client %1 now connected").arg(json.name))
-                }
-
+                // Normal message
                 if(json.type === "plain") {
                     sendTextMessage(webSocket, json)
                 }
+
+                // Register message
+                if(json.type === "register") {
+                    // First message after socket connection
+
+                    // If name is duplicate don't add new user
+                    if(newClient(webSocket, json)) {
+                        console.warn("New client connected:", user_key)
+                        // Name has not taken yet
+                        sendInfoMessage(qsTr("New user %1 now joined to chat").arg(json.name))
+
+                        webSocket.onStatusChanged.connect(function() {
+                            console.warn("Client status changed:", user_key, "Status:", webSocket.status)
+                            var user = getUserByKey(user_key)
+
+                            if (webSocket.status === WebSocket.Error) {
+                                // Only show errors to server
+                                appendInfoMessage(qsTr("Client %1 has an error error: %2 ").arg(user.name).arg(webSocket.errorString));
+                            } else if (webSocket.status === WebSocket.Closed) {
+                                var name = user.name
+                                if(removeClient(user.user_key)) {
+                                    sendInfoMessage(qsTr("%1 left the chat").arg(name));
+                                }
+                            }
+                        });
+
+                    } else {
+                        // Name is duplicate
+                        webSocket.sendTextMessage(JSON.stringify({
+                                                                     type:"error",
+                                                                     message: qsTr("Name is duplicate")
+                                                                 }))
+                        removeClient(user_key)
+                        webSocket.active = false
+                    }
+                }
+
             });
+
+
         }
 
         onErrorStringChanged: {
@@ -230,6 +263,10 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
     function newClient(socket, json) {
         var user_key = Qt.btoa(socket.toString())
 
+        if(isUserNameDuplicate(json.name)) {
+            return false
+        }
+
         userModel.append({
                              socket: socket,
                              name: json.name,
@@ -239,11 +276,52 @@ Mel veri homero prodesset in, mel ne elit scripta consequuntur. Ex his suavitate
         return true
     }
 
+    function removeClient(user_key) {
+        for(var i = 0; i < userModel.count; ++i) {
+            if(userModel.get(i).user_key === user_key) {
+                userModel.remove(i)
+                return true
+            }
+        }
+        return false
+    }
+
+    function getUserByKey(user_key) {
+        for(var i = 0; i < userModel.count; ++i) {
+            if(userModel.get(i).user_key === user_key) {
+                return userModel.get(i)
+            }
+        }
+        return false
+    }
+
+    function isUserNameDuplicate(user_name) {
+        for(var i = 0; i < userModel.count; ++i) {
+            if(userModel.get(i).name === user_name) {
+                return true
+            }
+        }
+        return false
+    }
+
     function sendTextMessage(sender, json) {
         // Send message to all users
         appendTextMessage(sender, json)
         for(var i = 0; i < userModel.count; ++i) {
             userModel.get(i).socket.sendTextMessage(JSON.stringify(json));
+        }
+    }
+
+    function sendInfoMessage(message) {
+        // Send message to all users
+        appendInfoMessage(message)
+        for(var i = 0; i < userModel.count; ++i) {
+            userModel.get(i).socket.sendTextMessage(JSON.stringify({
+                                                                       type: "info",
+                                                                       name: "",
+                                                                       message: message,
+                                                                       user_key: "SYSTEM"
+                                                                   }));
         }
     }
 
