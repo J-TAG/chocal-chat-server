@@ -43,7 +43,7 @@ ApplicationWindow {
                 onClicked: {
                     server.listen = false
                     disconnecAllClients()
-                    appendInfoMessage(qsTr("Listening stoped. New connections will not be activated but current connections are still active."))
+                    appendInfoMessage(qsTr("Listening stoped, all connections are closed and Chocal Server is now stoped."))
                 }
             }
 
@@ -102,7 +102,7 @@ ApplicationWindow {
 
                     if(user_key !== false) {
 
-                        // Name has not taken yet
+                        // Name is valid and is not taken yet
                         console.warn("New client connected:", user_key)
 
                         // Send accept message
@@ -112,12 +112,13 @@ ApplicationWindow {
 
                         webSocket.onStatusChanged.connect(function() {
                             console.warn("Client status changed:", user_key, "Status:", webSocket.status)
-                            var user = getUserByKey(user_key)
+
 
                             if (webSocket.status === WebSocket.Error) {
                                 // Only show errors to server
-                                appendInfoMessage(qsTr("Client %1 has an error: %2 ").arg(user.name).arg(webSocket.errorString));
+                                appendInfoMessage(qsTr("Error: %1 ").arg(webSocket.errorString));
                             } else if (webSocket.status === WebSocket.Closed) {
+                                var user = getUserByKey(user_key)
                                 var name = user.name
                                 if(removeClient(user.user_key)) {
                                     sendInfoMessage(qsTr("%1 left the chat").arg(name));
@@ -126,17 +127,20 @@ ApplicationWindow {
                         });
 
                     } else {
-                        // Name is duplicate
-                        webSocket.sendTextMessage(JSON.stringify({
-                                                                     type:"error",
-                                                                     name: qsTr("Server"),
-                                                                     message: qsTr("Name is duplicate"),
-                                                                     image: ""
-                                                                 }))
-                        removeClient(user_key)
+                        // Name is duplicate or invalid
+                        if(isUserNameDuplicate(json.name)) {
+                            // Name is duplicate
+                            sendSingleErrorMessage(webSocket, qsTr("Name is duplicate"))
+                        } else {
+                            // Name is not duplicate but Invalid
+                            sendSingleErrorMessage(webSocket, qsTr("Name is invalid"))
+                        }
+
+                        // Close web socket due to error
                         webSocket.active = false
                     }
                 }
+                // End register type message
 
             });
 
@@ -163,6 +167,8 @@ ApplicationWindow {
 
         z: 4
 
+        color: "#eee"
+
         // Title label
         Label {
             id: lblTitle
@@ -186,7 +192,7 @@ ApplicationWindow {
                 topMargin: 10
             }
 
-            text: server.listen ? qsTr("Listening on: %1").arg(server.url) : qsTr("Chocal Server is not listening.")
+            text: server.listen ? qsTr("Listening on: %1. Online users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is not listening.")
         }
         // End status text
 
@@ -210,8 +216,59 @@ ApplicationWindow {
 
         delegate: UserDelegate{}
 
+        // Add transitions
+        add: Transition {
+            // Fade in animation
+            NumberAnimation {
+                property: "opacity";
+                from: 0; to: 1.0;
+                duration: 400
+            }
+            // Coming animation
+            NumberAnimation {
+                property: "scale";
+                easing.amplitude: 0.3;
+                easing.type: Easing.OutExpo
+                from:0; to:1;
+                duration: 600
+            }
+        }
+        // End add transitions
+
+        // remove transitions
+        remove: Transition {
+            // Fade in animation
+            NumberAnimation {
+                property: "opacity";
+                from: 1.0; to: 0;
+                duration: 400
+            }
+            // Coming animation
+            NumberAnimation {
+                property: "scale";
+                easing.amplitude: 0.3;
+                easing.type: Easing.OutExpo
+                from:1; to:0;
+                duration: 600
+            }
+        }
+        // End remove transitions
+
+        // Displaced transitions
+        displaced: Transition {
+            // Fade in animation
+            NumberAnimation {
+                property: "y";
+                easing.type: Easing.InOutBack
+                duration: 600
+            }
+        }
+        // End displaced transitions
+
     }
     // End users area
+
+
 
     // Chat area
     ListView {
@@ -221,7 +278,7 @@ ApplicationWindow {
             top: rectHeader.bottom
             bottom: parent.bottom
             left: userView.right
-            right: rectSettings.left
+            right: settings.left
             topMargin: 40
         }
         z: 3
@@ -236,8 +293,8 @@ ApplicationWindow {
     // End chat area
 
     // Settings area
-    Rectangle {
-        id: rectSettings
+    Settings {
+        id: settings
 
         anchors {
             top: rectHeader.bottom
@@ -247,7 +304,7 @@ ApplicationWindow {
         z: 2
         width: main.width / 4
 
-        color: "blue"
+        color: "#eee"
     }
     // End settings area
 
@@ -290,6 +347,11 @@ ApplicationWindow {
             return false
         }
 
+        // Empty name is not valid
+        if(json.name.trim() === "") {
+            return false
+        }
+
         // Everything is ok, so add user
         userModel.append({
                              socket: socket,
@@ -298,6 +360,9 @@ ApplicationWindow {
                          })
 
         updateUserKeysIndex()
+
+        // Navigate to newly added user
+        userView.currentIndex = user_keys_index[user_key]
 
         return user_key
     }
@@ -388,6 +453,18 @@ ApplicationWindow {
         userModel.get(user_keys_index[user_key]).socket.sendTextMessage(json_string);
     }
 
+    // Send an error message to a single client
+    function sendSingleErrorMessage(socket, message) {
+        var json_string = JSON.stringify({
+                                             type:"error",
+                                             name: qsTr("Server"),
+                                             message: message,
+                                             image: ""
+                                         })
+
+        socket.sendTextMessage(json_string)
+    }
+
     // Add user name to json object
     function addUserName(user_key, json) {
         json.name = getUserName(user_key)
@@ -435,8 +512,8 @@ ApplicationWindow {
 
     // Disconnect all clients
     function disconnecAllClients() {
-        for(var i = 0; i < userModel.count; ++i) {
-            userModel.get(i).socket.active = false;
+        for (var user_key in user_keys_index) {
+            removeClient(user_key)
         }
     }
 

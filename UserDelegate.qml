@@ -17,25 +17,6 @@ Rectangle {
 
         height: Math.max(itmText.height, itmImage.height) + 20
 
-        populate:Transition {
-            // Fade in animation
-            NumberAnimation {
-                property: "opacity";
-                from: 0; to: 1.0;
-                duration: 400
-            }
-            // Coming animation
-            NumberAnimation {
-                property: "scale";
-                easing.amplitude: 0.3;
-                easing.type: Easing.OutExpo
-                from:0; to:1;
-                target:layout;
-                duration: 600
-            }
-        }
-        // End populate transitions
-
         // Avatar item
         Item {
             id: itmImage
@@ -77,7 +58,7 @@ Rectangle {
         Item {
             id: itmText
 
-            height: txtName.height + txtStatus.height
+            height: txtName.height + txtStatus.height + 20
             width: txtName.width
 
             // User name
@@ -89,6 +70,7 @@ Rectangle {
                 color: "#ea8627"
                 font.bold: true
                 wrapMode: Text.Wrap
+                horizontalAlignment:  Text.AlignLeft
             }
 
             // Status text
