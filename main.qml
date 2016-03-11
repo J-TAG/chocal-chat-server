@@ -120,7 +120,7 @@ ApplicationWindow {
                             } else if (webSocket.status === WebSocket.Closed) {
                                 var user = getUserByKey(user_key)
                                 var name = user.name
-                                if(removeClient(user.user_key)) {
+                                if(removeClient(user_key)) {
                                     sendInfoMessage(qsTr("%1 left the chat").arg(name));
                                 }
                             }
@@ -512,8 +512,8 @@ ApplicationWindow {
 
     // Disconnect all clients
     function disconnecAllClients() {
-        for (var user_key in user_keys_index) {
-            removeClient(user_key)
+        for(var i = 0; i < userModel.count; ++i) {
+            userModel.get(i).socket.active = false
         }
     }
 
