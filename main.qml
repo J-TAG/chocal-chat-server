@@ -28,17 +28,32 @@ ApplicationWindow {
         Row {
             anchors.fill: parent
 
+            // Start button
             ToolButton {
                 text: qsTr("Start")
                 onClicked: {
                     server.listen = true
+                    appendInfoMessage(qsTr("Chocal Server started on %1").arg(server.url))
                 }
             }
 
+            // Stop button
             ToolButton {
                 text: qsTr("Stop")
                 onClicked: {
                     server.listen = false
+                    disconnecAllClients()
+                    appendInfoMessage(qsTr("Listening stoped. New connections will not be activated but current connections are still active."))
+                }
+            }
+
+            // Shutdown button
+            ToolButton {
+                text: qsTr("Shutdown")
+                onClicked: {
+                    server.listen = false
+                    disconnecAllClients()
+                    Qt.quit()
                 }
             }
 
@@ -90,6 +105,9 @@ ApplicationWindow {
                         // Name has not taken yet
                         console.warn("New client connected:", user_key)
 
+                        // Send accept message
+                        sendAcceptMessage(user_key)
+
                         sendInfoMessage(qsTr("New user %1 now joined to chat").arg(json.name))
 
                         webSocket.onStatusChanged.connect(function() {
@@ -113,8 +131,7 @@ ApplicationWindow {
                                                                      type:"error",
                                                                      name: qsTr("Server"),
                                                                      message: qsTr("Name is duplicate"),
-                                                                     image: "",
-                                                                     user_key: "SYSTEM"
+                                                                     image: ""
                                                                  }))
                         removeClient(user_key)
                         webSocket.active = false
@@ -169,7 +186,7 @@ ApplicationWindow {
                 topMargin: 10
             }
 
-            text: qsTr("Listening on: %1").arg(server.url)
+            text: server.listen ? qsTr("Listening on: %1").arg(server.url) : qsTr("Chocal Server is not listening.")
         }
         // End status text
 
@@ -253,8 +270,7 @@ ApplicationWindow {
                                 type: "info",
                                 name: "",
                                 message: message,
-                                image: "",
-                                user_key: "SYSTEM"
+                                image: ""
                             })
         gotoLast()
     }
@@ -322,6 +338,7 @@ ApplicationWindow {
         // Send message to all users
         addUserName(json.user_key, json)
         appendTextMessage(sender, json)
+        removeUserKey(json)
         var json_string = JSON.stringify(json)
         for(var i = 0; i < userModel.count; ++i) {
             userModel.get(i).socket.sendTextMessage(json_string);
@@ -336,8 +353,7 @@ ApplicationWindow {
                                                             type: "info",
                                                             name: getUserName("SYSTEM"),
                                                             message: message,
-                                                            image: "",
-                                                            user_key: "SYSTEM"
+                                                            image: ""
                                                         }))
 
         for(var i = 0; i < userModel.count; ++i) {
@@ -350,10 +366,26 @@ ApplicationWindow {
         // Send message to all users
         addUserName(json.user_key, json)
         appendImageMessage(sender, json)
+        removeUserKey(json)
         var json_string = JSON.stringify(json)
         for(var i = 0; i < userModel.count; ++i) {
             userModel.get(i).socket.sendTextMessage(json_string);
         }
+    }
+
+    // Sends an accepted message to client to approve that client is successfuly registered in the system
+    function sendAcceptMessage(user_key) {
+        // Send message only to accepted client
+        var json = {
+            type: "accepted",
+            name: getUserName("SYSTEM"),
+            message: qsTr("You are joined to chat successfully."),
+            user_key: user_key
+        }
+
+        var json_string = JSON.stringify(json)
+
+        userModel.get(user_keys_index[user_key]).socket.sendTextMessage(json_string);
     }
 
     // Add user name to json object
@@ -361,24 +393,30 @@ ApplicationWindow {
         json.name = getUserName(user_key)
     }
 
+    // Remove user key from json object
+    function removeUserKey(json) {
+        delete json.user_key
+    }
+
     // Check to see recieved json object from client is valid or not
     function validateRecievedMessage(socket, json) {
         // Check to see user key is valid or not
-        if(json.user_key === "SYSTEM") {
+        if(json.user_key === "SYSTEM" || !isValidUserKey(json.user_key)) {
             return false
         }
 
         return true
     }
 
-    // Get avatar path by id
-    function getAvatar(user_key) {
+    // Get avatar path by user name
+    function getAvatar(name) {
 
-        if(user_key === undefined || user_key === null || !fileio.hasAvatar(user_key)) {
+        if(name === undefined || name === null || name === ""
+                || name === getUserName("SYSTEM") || !fileio.hasAvatar(name)) {
             return "qrc:/img/img/no-avatar.png"
         }
 
-        return "file://" + fileio.getAvatarPath(user_key);
+        return "file://" + fileio.getAvatarPath(name);
     }
 
     // Get user name by its user key
@@ -388,6 +426,18 @@ ApplicationWindow {
         }
 
         return userModel.get(user_keys_index[user_key]).name
+    }
+
+    // Check to see if user key is valid or not
+    function isValidUserKey(user_key) {
+        return typeof user_keys_index[user_key] !== 'undefined'
+    }
+
+    // Disconnect all clients
+    function disconnecAllClients() {
+        for(var i = 0; i < userModel.count; ++i) {
+            userModel.get(i).socket.active = false;
+        }
     }
 
 }

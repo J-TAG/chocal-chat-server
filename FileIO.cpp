@@ -42,33 +42,33 @@ bool FileIO::decodeAndWrite(const QString& source, const QString& data)
 	return true;
 }
 
-bool FileIO::setUserAvatar(const QString &user_key, const QString &data)
+bool FileIO::setUserAvatar(const QString &name, const QString &data)
 {
 	if(!m_tmpAvatarDir.isValid()) {
 		return false;
 	}
 
-	QString avatar_path = this->getAvatarPath(user_key);
+	QString avatar_path = this->getAvatarPath(name);
 
 	return this->decodeAndWrite(avatar_path, data);
 }
 
-bool FileIO::hasAvatar(const QString &user_key)
+bool FileIO::hasAvatar(const QString &name)
 {
-	return QFile::exists(this->getAvatarPath(user_key));
+	return QFile::exists(this->getAvatarPath(name));
 }
 
-QString FileIO::getAvatarPath(const QString &user_key)
+QString FileIO::getAvatarPath(const QString &name)
 {
 	if(!m_tmpAvatarDir.isValid()) {
 		return 0;
 	}
 
-	if(user_key == 0) {
+	if(name == 0) {
 		return this->m_tmpAvatarDir.path();
 	}
 
-	return m_tmpAvatarDir.path().append("/").append(user_key);
+	return m_tmpAvatarDir.path().append("/").append(name);
 }
 
 QString FileIO::getImagePath(const QString &name)

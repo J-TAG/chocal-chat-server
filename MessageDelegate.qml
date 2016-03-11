@@ -57,7 +57,7 @@ Item {
                     x: 10
 
                     fillMode: Image.PreserveAspectCrop
-                    source: getAvatar(user_key)
+                    source: getAvatar(name)
 
                     // Circle effect
                     layer.enabled: true
