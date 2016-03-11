@@ -14,7 +14,7 @@ Item {
         height: plainLayout.height
         width: plainLayout.width
 
-        visible: type === "plain"
+        visible: type === "plain" || type === "image"
 
         Row {
             id: plainLayout
@@ -93,12 +93,28 @@ Item {
                     font.bold: true
                 }
 
+                // Image
+                Image {
+                    id: img
+                    fillMode: Image.PreserveAspectFit
+                    visible: type === "image"
+                    source: type === "image" ? fileio.decodeImage(image) : ""
+
+                    anchors {
+                        top: txtName.bottom
+                        topMargin: 10
+                        right: parent.right
+                        rightMargin: 20
+                        left: parent.left
+                    }
+                }
+
                 // Message content
                 Text {
                     id: txtMessage
 
                     anchors {
-                        top: txtName.bottom
+                        top: img.bottom
                         topMargin: 10
                     }
                     width: messageView.width - 150

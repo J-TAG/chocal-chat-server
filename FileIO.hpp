@@ -19,9 +19,14 @@ public slots:
 	bool setUserAvatar(const QString& user_key, const QString& data);
 	bool hasAvatar(const QString& user_key);
 	QString getAvatarPath(const QString& user_key=0);
+	QString getImagePath(const QString& name);
+	QString decodeImage(const QString& data);
+	QString getNewUserKey();
+	QString getMd5Hash(const QString& data);
 
 protected:
 	QTemporaryDir m_tmpAvatarDir;
+	QTemporaryDir m_tmpImageDir;
 };
 
 #endif // FILEIO_HPP
