@@ -32,6 +32,21 @@ ApplicationWindow {
             ToolButton {
                 text: qsTr("Start")
                 onClicked: {
+                    var host = settings.getString("ip")
+                    var port = settings.getInt("port")
+
+                    if(host.trim() === "") {
+                        appendInfoMessage(qsTr("IP address is invalid"))
+                        return
+                    }
+
+                    if(port === "" || port <= 0 || port >= 65534) {
+                        appendInfoMessage(qsTr("Port number must be in range of 1 and 65534"))
+                        return
+                    }
+
+                    server.host = host
+                    server.port = port
                     server.listen = true
                     appendInfoMessage(qsTr("Chocal Server started on %1").arg(server.url))
                 }
@@ -71,8 +86,6 @@ ApplicationWindow {
     // Web socket server
     WebSocketServer {
         id: server
-        host: "192.168.1.12"
-        port: 36911
 
         onClientConnected: {
 
@@ -192,7 +205,7 @@ ApplicationWindow {
                 topMargin: 10
             }
 
-            text: server.listen ? qsTr("Listening on: %1. Online users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is not listening.")
+            text: server.listen ? qsTr("Listening on: %1. Online users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is ready to start.")
         }
         // End status text
 
@@ -278,7 +291,7 @@ ApplicationWindow {
             top: rectHeader.bottom
             bottom: parent.bottom
             left: userView.right
-            right: settings.left
+            right: settingView.left
             topMargin: 40
         }
         z: 3
@@ -294,7 +307,7 @@ ApplicationWindow {
 
     // Settings area
     Settings {
-        id: settings
+        id: settingView
 
         anchors {
             top: rectHeader.bottom
@@ -512,9 +525,11 @@ ApplicationWindow {
 
     // Disconnect all clients
     function disconnecAllClients() {
-        for(var i = 0; i < userModel.count; ++i) {
-            userModel.get(i).socket.active = false
+        var count = userModel.count
+        for(var i = 0; i < count; ++i) {
+            userModel.get(0).socket.active = false
         }
+        updateUserKeysIndex()
     }
 
 }
