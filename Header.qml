@@ -56,29 +56,26 @@ Rectangle {
         // For showing panel
         State {
             name: "show"
+            // Move panel down
             AnchorChanges {
                 target: rect
                 anchors.top: parent.top
             }
-//            AnchorChanges {
-//                target: btnCollapseExpand
-//                anchors.top: rect.bottom
-//            }
         },
         // For hiding panel
         State {
             name: "hide"
+            // move image up until status text
             AnchorChanges {
-                target: rect
+                target: imgServer
                 anchors.top: undefined
                 anchors.bottom: parent.top
             }
-//            AnchorChanges {
-//                target: btnCollapseExpand
-//                anchors.top: undefined
-//                anchors.bottom: rect.bottom
-//                anchors.right: rect.right
-//            }
+            // Make height of panel a little higher that status text height
+            PropertyChanges {
+                target: rect
+                height: txtStatus.height + 20
+            }
         }
     ]
 

@@ -5,7 +5,7 @@ import QtMultimedia 5.5
 ApplicationWindow {
     id: main
     visible: true
-    width: 900
+    width: 960
     height: 640
 
     property var user_keys_index: []

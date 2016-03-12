@@ -24,7 +24,7 @@ Rectangle {
         wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignHCenter
         onLinkActivated: Qt.openUrlExternally(link)
-        text: qsTr("Chocal Chat is a free software that will run in your local network to provide a cross platform solution for communicating between each other.<br/><br/>This program is the server application.<br/><br/>Developer: Hesam Gholami<br/><br/>This project is available <a href=\"https://github.com/J-TAG/chocal-chat-server\">on github</a>")
+        text: qsTr("Chocal Chat is a free software that will run in your local network to provide a cross platform solution for communicating between each other.<br/><br/>This program is the server application.<br/><br/>Developer: <a href=\"https://hesam.org\">Hesam Gholami</a><br/><br/>This project is available <a href=\"https://github.com/J-TAG/chocal-chat-server\">on github</a>")
     }
 
     // Pure Soft logo
