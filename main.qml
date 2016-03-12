@@ -11,6 +11,12 @@ ApplicationWindow {
 
     property var user_keys_index: []
 
+    // Timer for splash screen
+    Timer {
+        interval:2000; running: true; repeat: false
+        onTriggered: flipable.flipped = true
+    }
+
     // User model
     ListModel {
         id: userModel
@@ -79,16 +85,17 @@ ApplicationWindow {
                     Qt.quit()
                 }
             }
-
         }
+        // End toolbar row
     }
     // End toolbar
 
-    // Background picture
+    // Background tile picture
     Image {
-        id: imgBackground
-        fillMode: Image.PreserveAspectCrop
-        source: "qrc:/img/img/background.jpg"
+        id: imgBackTile
+        anchors.fill: parent
+        fillMode: Image.Tile
+        source: "qrc:/img/img/back-tile.jpg"
     }
 
     // Web socket server
@@ -175,162 +182,235 @@ ApplicationWindow {
     }
     // End web socket server
 
-    // Header area
-    Rectangle {
-        id: rectHeader
+    // Flipable
+    Flipable {
+        id: flipable
 
-        anchors {
-            top: parent.top
-            right: parent.right
-            left: parent.left
-        }
-        height: 80
+        property bool flipped: false
 
-        z: 4
+        anchors.fill: parent
 
-        color: "#eee"
+        // Main item
+        back: Item {
+            id: front
+            anchors.fill: parent
 
-        // Title label
-        Label {
-            id: lblTitle
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: parent.top
-                topMargin: 20
+            // Background picture
+            Image {
+                id: imgBackground
+                source: "qrc:/img/img/background.jpg"
             }
 
-            text: qsTr("Chocal Server")
-        }
-        // End title label
+            // Header area
+            Rectangle {
+                id: rectHeader
 
-        // Status text
-        Text {
-            id: txtStatus
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                    left: parent.left
+                }
+                height: 80
 
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: lblTitle.bottom
-                topMargin: 10
+                z: 4
+
+                color: "#eee"
+
+                // Title label
+                Label {
+                    id: lblTitle
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        top: parent.top
+                        topMargin: 20
+                    }
+
+                    text: qsTr("Chocal Server")
+                }
+                // End title label
+
+                // Status text
+                Text {
+                    id: txtStatus
+
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        top: lblTitle.bottom
+                        topMargin: 10
+                    }
+
+                    text: server.listen ? qsTr("Listening on: %1. Online users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is ready to start.")
+                }
+                // End status text
+
+
             }
+            // End header area
 
-            text: server.listen ? qsTr("Listening on: %1. Online users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is ready to start.")
+            // Users area
+            ListView {
+                id: userView
+
+                anchors {
+                    top: rectHeader.bottom
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                z: 2
+                width: main.width / 4
+
+                model: userModel
+
+                delegate: UserDelegate{}
+
+                // Add transitions
+                add: Transition {
+                    // Fade in animation
+                    NumberAnimation {
+                        property: "opacity";
+                        from: 0; to: 1.0;
+                        duration: 400
+                    }
+                    // Coming animation
+                    NumberAnimation {
+                        property: "scale";
+                        easing.amplitude: 0.3;
+                        easing.type: Easing.OutExpo
+                        from:0; to:1;
+                        duration: 600
+                    }
+                }
+                // End add transitions
+
+                // remove transitions
+                remove: Transition {
+                    // Fade in animation
+                    NumberAnimation {
+                        property: "opacity";
+                        from: 1.0; to: 0;
+                        duration: 400
+                    }
+                    // Coming animation
+                    NumberAnimation {
+                        property: "scale";
+                        easing.amplitude: 0.3;
+                        easing.type: Easing.OutExpo
+                        from:1; to:0;
+                        duration: 600
+                    }
+                }
+                // End remove transitions
+
+                // Displaced transitions
+                displaced: Transition {
+                    // Fade in animation
+                    NumberAnimation {
+                        property: "y";
+                        easing.type: Easing.InOutBack
+                        duration: 600
+                    }
+                }
+                // End displaced transitions
+
+            }
+            // End users area
+
+
+
+            // Chat area
+            ListView {
+                id: messageView
+
+                anchors {
+                    top: rectHeader.bottom
+                    bottom: parent.bottom
+                    left: userView.right
+                    right: settingView.left
+                    topMargin: 40
+                }
+                z: 3
+
+                spacing: 40
+
+                model: messageModel
+
+                delegate: MessageDelegate{}
+
+            }
+            // End chat area
+
+            // Settings area
+            Settings {
+                id: settingView
+
+                anchors {
+                    top: rectHeader.bottom
+                    bottom: parent.bottom
+                    right: parent.right
+                }
+                z: 2
+                width: main.width / 4
+
+                state: "hide"
+                color: "#eee"
+                border.color: "#333"
+
+            }
+            // End settings area
         }
-        // End status text
+        // End main item
 
+        // Splash item
+        front: Item {
+            id: back
+            anchors.fill: parent
+            Rectangle {
+                anchors.fill: parent
+                color: "purple"
 
+                Label {
+                    anchors.centerIn: parent
+                    color: "#eee"
+                    font.pointSize: 72
+                    text: qsTr("Chocal Server")
+                }
+            }
+        }
+        // End splash item
+
+        // Transforms
+        transform: Rotation {
+            id: rotation
+            origin.x: flipable.width/2
+            origin.y: flipable.height/2
+            // set axis.x to 1 to rotate around x-axis
+            axis.x: 1; axis.y: 0; axis.z: 0
+            angle: 0    // the default angle
+        }
+
+        // States
+        states: State {
+            name: "back"
+            PropertyChanges { target: rotation; angle: -180 }
+            when: flipable.flipped
+        }
+
+        // Transitions
+        transitions: Transition {
+            NumberAnimation {
+                target: rotation
+                property: "angle"
+                easing.type: Easing.OutQuint
+                duration: 2000
+            }
+        }
     }
-    // End header area
-
-    // Users area
-    ListView {
-        id: userView
-
-        anchors {
-            top: rectHeader.bottom
-            bottom: parent.bottom
-            left: parent.left
-        }
-        z: 2
-        width: main.width / 4
-
-        model: userModel
-
-        delegate: UserDelegate{}
-
-        // Add transitions
-        add: Transition {
-            // Fade in animation
-            NumberAnimation {
-                property: "opacity";
-                from: 0; to: 1.0;
-                duration: 400
-            }
-            // Coming animation
-            NumberAnimation {
-                property: "scale";
-                easing.amplitude: 0.3;
-                easing.type: Easing.OutExpo
-                from:0; to:1;
-                duration: 600
-            }
-        }
-        // End add transitions
-
-        // remove transitions
-        remove: Transition {
-            // Fade in animation
-            NumberAnimation {
-                property: "opacity";
-                from: 1.0; to: 0;
-                duration: 400
-            }
-            // Coming animation
-            NumberAnimation {
-                property: "scale";
-                easing.amplitude: 0.3;
-                easing.type: Easing.OutExpo
-                from:1; to:0;
-                duration: 600
-            }
-        }
-        // End remove transitions
-
-        // Displaced transitions
-        displaced: Transition {
-            // Fade in animation
-            NumberAnimation {
-                property: "y";
-                easing.type: Easing.InOutBack
-                duration: 600
-            }
-        }
-        // End displaced transitions
-
-    }
-    // End users area
+    // End flipabel
 
 
 
-    // Chat area
-    ListView {
-        id: messageView
 
-        anchors {
-            top: rectHeader.bottom
-            bottom: parent.bottom
-            left: userView.right
-            right: settingView.left
-            topMargin: 40
-        }
-        z: 3
 
-        spacing: 40
-
-        model: messageModel
-
-        delegate: MessageDelegate{}
-
-    }
-    // End chat area
-
-    // Settings area
-    Settings {
-        id: settingView
-
-        anchors {
-            top: rectHeader.bottom
-            bottom: parent.bottom
-            right: parent.right
-        }
-        z: 2
-        width: main.width / 4
-
-        state: "hide"
-        color: "#eee"
-        border.color: "#333"
-
-    }
-    // End settings area
 
     // Functions
 

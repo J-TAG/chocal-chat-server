@@ -8,5 +8,6 @@
     <qresource prefix="/img">
         <file>img/background.jpg</file>
         <file>img/no-avatar.png</file>
+        <file>img/back-tile.jpg</file>
     </qresource>
 </RCC>
