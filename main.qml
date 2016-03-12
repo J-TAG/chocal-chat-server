@@ -62,6 +62,14 @@ ApplicationWindow {
                 }
             }
 
+            // Settings button
+            ToolButton {
+                text: qsTr("Settings")
+                onClicked: {
+                    settingView.state = settingView.state === "show" ? "hide" : "show"
+                }
+            }
+
             // Shutdown button
             ToolButton {
                 text: qsTr("Shutdown")
@@ -317,7 +325,10 @@ ApplicationWindow {
         z: 2
         width: main.width / 4
 
+        state: "hide"
         color: "#eee"
+        border.color: "#333"
+
     }
     // End settings area
 

@@ -2,7 +2,9 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 
 Rectangle {
+    id: rect
 
+    // Main Layout
     Column {
         id: colTitles
         anchors {
@@ -13,19 +15,24 @@ Rectangle {
         }
         spacing: 20
 
+        // Title label
         Label {
             text: qsTr("Settings")
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
+        // Server IP field
         Row {
             width: parent.width
 
+            // Description text
             Text{
                 text:qsTr("Chocal Server IP address:")
                 width: parent.width / 2
                 wrapMode: Text.WordWrap
             }
+
+            // Input field
             TextField {
                 id: txtIp
                 width: parent.width / 2
@@ -33,15 +40,20 @@ Rectangle {
                 text: settings.getString("ip")
             }
         }
+        // End server IP field
 
+        // Port number field
         Row {
             width: parent.width
 
+            // Description text
             Text{
                 text:qsTr("Port number:")
                 width: parent.width / 2
                 wrapMode: Text.WordWrap
             }
+
+            // Input field
             TextField{
                 id: txtPort
                 width: parent.width / 2
@@ -53,24 +65,75 @@ Rectangle {
                 text: settings.getInt("port", "36911")
             }
         }
+        // End port number field
 
-        // Save button
-        Button {
-            text: qsTr("Save")
+        // Bottom buttons
+        Row {
+            spacing: 10
 
-            onClicked: {
-                if(!txtPort.acceptableInput) {
-                    appendInfoMessage(qsTr("Please enter a port number between 1 and 65534"))
-                    return
+            // Save button
+            Button {
+                text: qsTr("Save")
+
+                onClicked: {
+                    if(!txtPort.acceptableInput) {
+                        appendInfoMessage(qsTr("Please enter a port number between 1 and 65534"))
+                        return
+                    }
+
+                    settings.setValue("ip", txtIp.text)
+                    settings.setValue("port", txtPort.text)
+                    appendInfoMessage(qsTr("Settings are successfuly saved. You must restart Chocal Server for settings to take effect"))
+                    rect.state = "hide"
                 }
-
-                settings.setValue("ip", txtIp.text)
-                settings.setValue("port", txtPort.text)
-                appendInfoMessage(qsTr("Settings are successfuly saved. You must restart Chocal Server for settings to take effect"))
             }
+
+            // Cancel button
+            Button {
+                text: qsTr("Cancel")
+
+                onClicked: {
+                    rect.state = "hide"
+                }
+            }
+
         }
+        // End bottom buttons
 
 
     }
+    // End main layout
+
+
+    // Transitions
+    transitions: Transition {
+        // smoothly reanchor settings panel and move into new position
+        AnchorAnimation {
+            easing.type: Easing.OutExpo
+            duration: 600
+        }
+    }
+
+    // States
+    states: [
+        // For showing panel
+        State {
+            name: "show"
+            AnchorChanges {
+                target: rect
+                anchors.right: rect.parent.right
+                anchors.left: undefined
+            }
+        },
+        // For hiding panel
+        State {
+            name: "hide"
+            AnchorChanges {
+                target: rect
+                anchors.right: undefined
+                anchors.left: rect.parent.right
+            }
+        }
+    ]
 
 }
