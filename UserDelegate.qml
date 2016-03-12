@@ -1,4 +1,5 @@
 import QtQuick 2.5
+import QtQuick.Controls 1.4
 import QtGraphicalEffects 1.0
 
 // Container rectangle
@@ -91,6 +92,104 @@ Rectangle {
 
     }
     // End row
+
+    // Handle mouse click
+    MouseArea {
+        anchors.fill: layout
+        onClicked: {
+            rectDel.state = "show"
+        }
+    }
+    // End handling mouse click
+
+    // Delete question rectangle
+    Rectangle {
+        id: rectDel
+
+        anchors.fill: parent
+
+        state: "hide"
+        color: "#eee"
+
+        // Delete question layout
+        Column {
+            anchors.fill: parent
+            spacing: 10
+
+            // Delete question text
+            Text {
+                anchors {
+                    right: parent.right
+                    left: parent.left
+                }
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+
+                text: qsTr("Are you sure? You are about to remove this user from chat")
+            }
+
+            // Buttons
+            Row {
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+
+                // Remove button
+                Button {
+                    text: qsTr("Remove")
+                    onClicked: {
+                        forceCloseClient(user_key)
+                    }
+                }
+
+                // No button
+                Button {
+                    text: qsTr("No")
+                    onClicked: {
+                        rectDel.state = "hide"
+                    }
+                }
+
+            }
+            // End buttons
+
+        }
+        // End delete question layout
+
+
+        // Transitions
+        transitions: Transition {
+            // smoothly fade question
+            PropertyAnimation{
+                property: "opacity"
+                easing.type: Easing.OutExpo
+                duration: 1000
+            }
+        }
+
+        // States
+        states: [
+            // For showing question
+            State {
+                name: "show"
+                PropertyChanges {
+                    target: rectDel
+                    opacity: .8
+                    enabled: true
+                }
+            },
+            // For hiding question
+            State {
+                name: "hide"
+                PropertyChanges {
+                    target: rectDel
+                    opacity: 0
+                    enabled: false
+                }
+            }
+        ]
+    }
+    // End delete question rectangle
 
 }
 // End container rectangle

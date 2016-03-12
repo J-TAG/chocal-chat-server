@@ -62,6 +62,7 @@ ApplicationWindow {
             ToolButton {
                 text: qsTr("Stop")
                 onClicked: {
+                    sendInfoMessage(qsTr("Server stoped by admin"))
                     server.listen = false
                     disconnecAllClients()
                     appendInfoMessage(qsTr("Listening stoped, all connections are closed and Chocal Server is now stoped."))
@@ -146,11 +147,14 @@ ApplicationWindow {
                                 // Only show errors to server
                                 appendInfoMessage(qsTr("Error: %1 ").arg(webSocket.errorString));
                             } else if (webSocket.status === WebSocket.Closed) {
-                                var user = getUserByKey(user_key)
-                                var name = user.name
-                                if(removeClient(user_key)) {
-                                    sendInfoMessage(qsTr("%1 left the chat").arg(name));
+
+                                if(isValidUserKey(user_key)) {
+                                    var name = getUserName(user_key)
+                                    if(removeClient(user_key)) {
+                                        sendInfoMessage(qsTr("%1 left the chat").arg(name));
+                                    }
                                 }
+
                             }
                         });
 
@@ -368,12 +372,24 @@ ApplicationWindow {
                 anchors.fill: parent
                 color: "purple"
 
+                // Title label
                 Label {
                     anchors.centerIn: parent
                     color: "#eee"
                     font.pointSize: 72
                     text: qsTr("Chocal Server")
                 }
+                // End title label
+
+                // Click handlig
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        flipable.flipped = true
+                    }
+                }
+                // End click handling
+
             }
         }
         // End splash item
@@ -408,15 +424,11 @@ ApplicationWindow {
     // End flipabel
 
 
-
-
-
-
     // Functions
 
     // Goes to last message on the list
     function gotoLast() {
-        messageView.positionViewAtEnd()
+        messageView.currentIndex = messageModel.count - 1
     }
 
     // Show a plain text message in the message list
@@ -473,9 +485,24 @@ ApplicationWindow {
 
     // Remove an existing client from server
     function removeClient(user_key) {
-        userModel.remove(user_keys_index[user_key])
-        updateUserKeysIndex()
-        return true
+        if(isValidUserKey(user_key)) {
+            userModel.remove(user_keys_index[user_key])
+            updateUserKeysIndex()
+            return true
+        }
+
+        return false
+    }
+
+    // Close connection from a client and remove it from server
+    function closeClient(user_key) {
+        userModel.get(user_keys_index[user_key]).socket.active = false
+    }
+
+    // This function will exactly did what closeClient() does but also show a message that indicate admin is forcly closed client
+    function forceCloseClient(user_key) {
+        sendInfoMessage(qsTr("Server admin removed %1 from chat").arg(getUserName(user_key)))
+        closeClient(user_key)
     }
 
     // Sync user_keys_index array
