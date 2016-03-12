@@ -20,5 +20,6 @@
         <file>img/toolbar-about.png</file>
         <file>img/server.png</file>
         <file>img/toolbar-collapse-expand.png</file>
+        <file>img/puresoft-logo.png</file>
     </qresource>
 </RCC>

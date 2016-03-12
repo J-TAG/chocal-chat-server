@@ -12,11 +12,13 @@ Rectangle {
     Text {
         id: txtInfo
         anchors {
-            fill: parent
-            topMargin: 80
+            top: parent.top
+            topMargin: 40
+            right: parent.right
             rightMargin: 40
+            left: parent.left
             leftMargin: 40
-            bottomMargin: 80
+            bottomMargin: 40
         }
 
         wrapMode: Text.WordWrap
@@ -25,11 +27,21 @@ Rectangle {
         text: qsTr("Chocal Chat is a free software that will run in your local network to provide a cross platform solution for communicating between each other.<br/><br/>This program is the server application.<br/><br/>Developer: Hesam Gholami<br/><br/>This project is available <a href=\"https://github.com/J-TAG/chocal-chat-server\">on github</a>")
     }
 
+    // Pure Soft logo
+    Image {
+        id: imgPure
+        source: "qrc:/img/img/puresoft-logo.png"
+        anchors {
+            top: txtInfo.bottom
+            horizontalCenter: txtInfo.horizontalCenter
+        }
+    }
+
     // Copyright text
     Text {
         id: txtCopyright
         anchors {
-            top: txtInfo.bottom
+            top: imgPure.bottom
             horizontalCenter: txtInfo.horizontalCenter
         }
 

@@ -6,7 +6,7 @@ ApplicationWindow {
     id: main
     visible: true
     width: 900
-    height: 600
+    height: 640
 
     property var user_keys_index: []
 
