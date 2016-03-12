@@ -6,7 +6,7 @@ This repository contains the server application that is needed to handle clients
 
 # Install
 
-1. Chocal Chat server application is based on Qt Quick, so you need to install Qt development tools. It is tested on Linux Fedora 23 and Windows 10 but not Mac OS (Probably it should run there without any problems).
+1. Chocal Chat server application is based on Qt Quick, so you need to install Qt development tools. It is tested on Fedora 23 but not on Mac or Windows. Although it should be run there without any problems.
 
 2. Clone repository from github and open `ChocalServer.pro` in Qt Creator.
 
