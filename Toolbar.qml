@@ -59,6 +59,17 @@ ToolBar {
             }
         }
 
+        // Expand/Collapse button
+        ToolButton {
+            text: header.state === "show" ? qsTr("Collapse") : qsTr("Expand")
+            tooltip: header.state === "show" ? qsTr("Collapse header bar") : qsTr("Expand header bar")
+            iconSource: "qrc:/img/img/toolbar-collapse-expand.png"
+
+            onClicked: {
+                header.state = header.state === "show" ? "hide" : "show"
+            }
+        }
+
         // Settings button
         ToolButton {
             text: qsTr("Settings")

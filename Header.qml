@@ -2,7 +2,7 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 
 Rectangle {
-    id: rectHeader
+    id: rect
 
     anchors {
         top: parent.top
@@ -14,6 +14,7 @@ Rectangle {
     z: 4
 
     color: "#eee"
+    state: "show"
 
     Image {
         id: imgServer
@@ -41,15 +42,45 @@ Rectangle {
     }
     // End status text
 
-    Button {
-        anchors {
-            bottom: parent.bottom
-            right: parent.right
-
+    // Transitions
+    transitions: Transition {
+        // smoothly reanchor settings panel and move into new position
+        AnchorAnimation {
+            easing.type: Easing.OutExpo
+            duration: 600
         }
-
-        text: qsTr("Collapse")
     }
+
+    // States
+    states: [
+        // For showing panel
+        State {
+            name: "show"
+            AnchorChanges {
+                target: rect
+                anchors.top: parent.top
+            }
+//            AnchorChanges {
+//                target: btnCollapseExpand
+//                anchors.top: rect.bottom
+//            }
+        },
+        // For hiding panel
+        State {
+            name: "hide"
+            AnchorChanges {
+                target: rect
+                anchors.top: undefined
+                anchors.bottom: parent.top
+            }
+//            AnchorChanges {
+//                target: btnCollapseExpand
+//                anchors.top: undefined
+//                anchors.bottom: rect.bottom
+//                anchors.right: rect.right
+//            }
+        }
+    ]
 
 }
 
