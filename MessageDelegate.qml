@@ -120,6 +120,7 @@ Item {
                     width: messageView.width - 150
 
                     wrapMode: Text.Wrap
+                    onLinkActivated: Qt.openUrlExternally(link)
                     text: message
                 }
 

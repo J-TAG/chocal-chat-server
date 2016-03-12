@@ -7,7 +7,7 @@ ApplicationWindow {
     id: main
     visible: true
     width: 900
-    height: 500
+    height: 600
 
     property var user_keys_index: []
 
@@ -106,9 +106,16 @@ ApplicationWindow {
                 iconSource: "qrc:/img/img/toolbar-about.png"
 
                 onClicked: {
-                    // TODO : Add about dialog
+                    if(about.state === "show") {
+                        flipable.flipped = true
+                        about.state = "hide"
+                    } else {
+                        flipable.flipped = false
+                        about.state = "show"
+                    }
                 }
             }
+
         }
         // End toolbar row
     }
@@ -237,36 +244,36 @@ ApplicationWindow {
                     right: parent.right
                     left: parent.left
                 }
-                height: 80
+                height: imgServer.height + 40
 
                 z: 4
 
                 color: "#eee"
 
-                // Title label
-                Label {
-                    id: lblTitle
+                Image {
+                    id: imgServer
                     anchors {
-                        horizontalCenter: parent.horizontalCenter
                         top: parent.top
                         topMargin: 20
+                        horizontalCenter: parent.horizontalCenter
                     }
-
-                    text: qsTr("Chocal Server")
+                    fillMode: Image.PreserveAspectFit
+                    source: "qrc:/img/img/server.png"
                 }
-                // End title label
 
                 // Status text
                 Text {
                     id: txtStatus
 
                     anchors {
-                        horizontalCenter: parent.horizontalCenter
-                        top: lblTitle.bottom
+                        left: parent.left
+                        right: imgServer.left
+                        top: parent.top
                         topMargin: 10
                     }
 
-                    text: server.listen ? qsTr("Listening on: %1. Online users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is ready to start.")
+                    wrapMode: Text.WordWrap
+                    text: server.listen ? qsTr("Listening on: %1.\nOnline users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is ready to start.")
                 }
                 // End status text
 
@@ -380,7 +387,6 @@ ApplicationWindow {
 
                 state: "hide"
                 color: "#eee"
-                border.color: "#333"
 
             }
             // End settings area
@@ -403,16 +409,6 @@ ApplicationWindow {
                     text: qsTr("Chocal Server")
                 }
                 // End title label
-
-                // Click handlig
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        flipable.flipped = true
-                    }
-                }
-                // End click handling
-
             }
         }
         // End splash item
@@ -446,6 +442,14 @@ ApplicationWindow {
     }
     // End flipabel
 
+    // About box
+    About {
+        id: about
+
+        anchors.fill: parent
+
+        state: "hide"
+    }
 
     // Functions
 

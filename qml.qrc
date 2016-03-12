@@ -4,6 +4,7 @@
         <file>MessageDelegate.qml</file>
         <file>UserDelegate.qml</file>
         <file>Settings.qml</file>
+        <file>About.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file>img/background.jpg</file>
@@ -14,5 +15,6 @@
         <file>img/toolbar-start.png</file>
         <file>img/toolbar-stop.png</file>
         <file>img/toolbar-about.png</file>
+        <file>img/server.png</file>
     </qresource>
 </RCC>
