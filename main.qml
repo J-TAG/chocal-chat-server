@@ -1,6 +1,6 @@
 import QtQuick 2.5
-import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
+import QtMultimedia 5.5
 
 ApplicationWindow {
     id: main
@@ -14,6 +14,16 @@ ApplicationWindow {
     Timer {
         interval:2000; running: true; repeat: false
         onTriggered: flipable.flipped = true
+    }
+
+    SoundEffect {
+        id: soundNewMsg
+        source: "qrc:/raw/raw/new-message.wav"
+    }
+
+    SoundEffect {
+        id: soundInfo
+        source: "qrc:/raw/raw/info.wav"
     }
 
     // User model
@@ -246,12 +256,14 @@ ApplicationWindow {
 
     // Show a plain text message in the message list
     function appendTextMessage(sender, json) {
+        newMessageSound()
         messageModel.append(json)
         gotoLast()
     }
 
     // Show an info message in the message list
     function appendInfoMessage(message) {
+        infoSound()
         messageModel.append({
                                 type: "info",
                                 name: "",
@@ -263,6 +275,7 @@ ApplicationWindow {
 
     // Show an image message in the message list
     function appendImageMessage(sender, json) {
+        newMessageSound()
         messageModel.append(json)
         gotoLast()
     }
@@ -461,6 +474,30 @@ ApplicationWindow {
             userModel.get(0).socket.active = false
         }
         updateUserKeysIndex()
+    }
+
+    // Plays a sound that indicate new message is arrived
+    function newMessageSound() {
+        if(!settings.getBool("newMessageSound", true)) {
+            return
+        }
+
+        if(soundNewMsg.playing) {
+            soundNewMsg.stop()
+        }
+        soundNewMsg.play()
+    }
+
+    // Plays a sound that indicate some info message is shown
+    function infoSound() {
+        if(!settings.getBool("infoSound", true)) {
+            return
+        }
+
+        if(soundInfo.playing) {
+            soundInfo.stop()
+        }
+        soundInfo.play()
     }
 
 }

@@ -22,4 +22,8 @@
         <file>img/toolbar-collapse-expand.png</file>
         <file>img/puresoft-logo.png</file>
     </qresource>
+    <qresource prefix="/raw">
+        <file>raw/new-message.wav</file>
+        <file>raw/info.wav</file>
+    </qresource>
 </RCC>

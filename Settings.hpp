@@ -17,6 +17,7 @@ public slots:
 	void setValue(const QString& key, const QString& value);
 	QString getString(const QString& key, const QString& defaultValue=0);
 	int getInt(const QString& key, int defaultValue=0);
+	bool getBool(const QString& key, bool defaultValue=false);
 
 protected:
 	QSettings settings;

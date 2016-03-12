@@ -67,6 +67,45 @@ Rectangle {
         }
         // End port number field
 
+        // New message notification field
+        Row {
+            width: parent.width
+
+            // Description text
+            Text{
+                text:qsTr("Play new message sounds:")
+                width: parent.width / 2
+                wrapMode: Text.WordWrap
+            }
+
+            // Input switch
+            Switch {
+                id: switchMessageNotification
+                checked: settings.getBool("newMessageSound", true)
+            }
+        }
+        // End message notification field
+
+        // Info notification field
+        Row {
+            width: parent.width
+
+            // Description text
+            Text{
+                text:qsTr("Play info sounds:")
+                width: parent.width / 2
+                wrapMode: Text.WordWrap
+            }
+
+            // Input switch
+            Switch {
+                id: switchInfoNotification
+                checked: settings.getBool("infoSound", true)
+            }
+        }
+        // End info notification field
+
+
         // Bottom buttons
         Row {
             spacing: 10
@@ -83,6 +122,8 @@ Rectangle {
 
                     settings.setValue("ip", txtIp.text)
                     settings.setValue("port", txtPort.text)
+                    settings.setValue("newMessageSound", switchMessageNotification.checked)
+                    settings.setValue("infoSound", switchInfoNotification.checked)
                     appendInfoMessage(qsTr("Settings are successfuly saved. You must restart Chocal Server for settings to take effect"))
                     rect.state = "hide"
                 }
