@@ -37,6 +37,9 @@ ApplicationWindow {
             // Start button
             ToolButton {
                 text: qsTr("Start")
+                tooltip: qsTr("Start Chocal Server")
+                iconSource: "qrc:/img/img/toolbar-start.png"
+
                 onClicked: {
                     var host = settings.getString("ip")
                     var port = settings.getInt("port")
@@ -61,6 +64,9 @@ ApplicationWindow {
             // Stop button
             ToolButton {
                 text: qsTr("Stop")
+                tooltip: qsTr("Stop Chocal Server")
+                iconSource: "qrc:/img/img/toolbar-stop.png"
+
                 onClicked: {
                     sendInfoMessage(qsTr("Server stoped by admin"))
                     server.listen = false
@@ -69,21 +75,38 @@ ApplicationWindow {
                 }
             }
 
+            // Shutdown button
+            ToolButton {
+                text: qsTr("Shutdown")
+                tooltip: qsTr("Shutdown Chocal Server")
+                iconSource: "qrc:/img/img/toolbar-shutdown.png"
+
+                onClicked: {
+                    server.listen = false
+                    disconnecAllClients()
+                    Qt.quit()
+                }
+            }
+
             // Settings button
             ToolButton {
                 text: qsTr("Settings")
+                tooltip: qsTr("Server settings")
+                iconSource: "qrc:/img/img/toolbar-settings.png"
+
                 onClicked: {
                     settingView.state = settingView.state === "show" ? "hide" : "show"
                 }
             }
 
-            // Shutdown button
+            // About button
             ToolButton {
-                text: qsTr("Shutdown")
+                text: qsTr("About")
+                tooltip: qsTr("About application")
+                iconSource: "qrc:/img/img/toolbar-about.png"
+
                 onClicked: {
-                    server.listen = false
-                    disconnecAllClients()
-                    Qt.quit()
+                    // TODO : Add about dialog
                 }
             }
         }
