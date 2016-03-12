@@ -5,6 +5,9 @@
         <file>UserDelegate.qml</file>
         <file>Settings.qml</file>
         <file>About.qml</file>
+        <file>Header.qml</file>
+        <file>Server.qml</file>
+        <file>Toolbar.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file>img/background.jpg</file>

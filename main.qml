@@ -1,7 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
-import QtWebSockets 1.0
 
 ApplicationWindow {
     id: main
@@ -30,95 +29,7 @@ ApplicationWindow {
     // End message model
 
     // Application toolbar
-    toolBar: ToolBar {
-        Row {
-            anchors.fill: parent
-
-            // Start button
-            ToolButton {
-                text: qsTr("Start")
-                tooltip: qsTr("Start Chocal Server")
-                iconSource: "qrc:/img/img/toolbar-start.png"
-
-                onClicked: {
-                    var host = settings.getString("ip")
-                    var port = settings.getInt("port")
-
-                    if(host.trim() === "") {
-                        appendInfoMessage(qsTr("IP address is invalid"))
-                        return
-                    }
-
-                    if(port === "" || port <= 0 || port >= 65534) {
-                        appendInfoMessage(qsTr("Port number must be in range of 1 and 65534"))
-                        return
-                    }
-
-                    server.host = host
-                    server.port = port
-                    server.listen = true
-                    appendInfoMessage(qsTr("Chocal Server started on %1").arg(server.url))
-                }
-            }
-
-            // Stop button
-            ToolButton {
-                text: qsTr("Stop")
-                tooltip: qsTr("Stop Chocal Server")
-                iconSource: "qrc:/img/img/toolbar-stop.png"
-
-                onClicked: {
-                    sendInfoMessage(qsTr("Server stoped by admin"))
-                    server.listen = false
-                    disconnecAllClients()
-                    appendInfoMessage(qsTr("Listening stoped, all connections are closed and Chocal Server is now stoped."))
-                }
-            }
-
-            // Shutdown button
-            ToolButton {
-                text: qsTr("Shutdown")
-                tooltip: qsTr("Shutdown Chocal Server")
-                iconSource: "qrc:/img/img/toolbar-shutdown.png"
-
-                onClicked: {
-                    server.listen = false
-                    disconnecAllClients()
-                    Qt.quit()
-                }
-            }
-
-            // Settings button
-            ToolButton {
-                text: qsTr("Settings")
-                tooltip: qsTr("Server settings")
-                iconSource: "qrc:/img/img/toolbar-settings.png"
-
-                onClicked: {
-                    settingView.state = settingView.state === "show" ? "hide" : "show"
-                }
-            }
-
-            // About button
-            ToolButton {
-                text: qsTr("About")
-                tooltip: qsTr("About application")
-                iconSource: "qrc:/img/img/toolbar-about.png"
-
-                onClicked: {
-                    if(about.state === "show") {
-                        flipable.flipped = true
-                        about.state = "hide"
-                    } else {
-                        flipable.flipped = false
-                        about.state = "show"
-                    }
-                }
-            }
-
-        }
-        // End toolbar row
-    }
+    toolBar: Toolbar { id: toolbar }
     // End toolbar
 
     // Background tile picture
@@ -130,90 +41,7 @@ ApplicationWindow {
     }
 
     // Web socket server
-    WebSocketServer {
-        id: server
-
-        onClientConnected: {
-
-            webSocket.onTextMessageReceived.connect(function(message) {
-
-                var json = JSON.parse(message)
-
-                // Check valid data
-                validateRecievedMessage(webSocket, json)
-
-                // Normal message
-                if(json.type === "plain") {
-                    sendTextMessage(webSocket, json)
-                }
-
-                // Image message
-                if(json.type === "image") {
-                    sendImageMessage(webSocket, json)
-                }
-
-                // Register message
-                if(json.type === "register") {
-                    // First message after socket connection
-
-                    // If name is duplicate don't add new user
-                    var user_key = newClient(webSocket, json)
-
-                    if(user_key !== false) {
-
-                        // Name is valid and is not taken yet
-                        console.warn("New client connected:", user_key)
-
-                        // Send accept message
-                        sendAcceptMessage(user_key)
-
-                        sendInfoMessage(qsTr("New user %1 now joined to chat").arg(json.name))
-
-                        webSocket.onStatusChanged.connect(function() {
-                            console.warn("Client status changed:", user_key, "Status:", webSocket.status)
-
-
-                            if (webSocket.status === WebSocket.Error) {
-                                // Only show errors to server
-                                appendInfoMessage(qsTr("Error: %1 ").arg(webSocket.errorString));
-                            } else if (webSocket.status === WebSocket.Closed) {
-
-                                if(isValidUserKey(user_key)) {
-                                    var name = getUserName(user_key)
-                                    if(removeClient(user_key)) {
-                                        sendInfoMessage(qsTr("%1 left the chat").arg(name));
-                                    }
-                                }
-
-                            }
-                        });
-
-                    } else {
-                        // Name is duplicate or invalid
-                        if(isUserNameDuplicate(json.name)) {
-                            // Name is duplicate
-                            sendSingleErrorMessage(webSocket, qsTr("Name is duplicate"))
-                        } else {
-                            // Name is not duplicate but Invalid
-                            sendSingleErrorMessage(webSocket, qsTr("Name is invalid"))
-                        }
-
-                        // Close web socket due to error
-                        webSocket.active = false
-                    }
-                }
-                // End register type message
-
-            });
-
-
-        }
-
-        onErrorStringChanged: {
-            appendInfoMessage(qsTr("Server error: %1").arg(errorString))
-        }
-
-    }
+    Server { id: server }
     // End web socket server
 
     // Flipable
@@ -236,49 +64,7 @@ ApplicationWindow {
             }
 
             // Header area
-            Rectangle {
-                id: rectHeader
-
-                anchors {
-                    top: parent.top
-                    right: parent.right
-                    left: parent.left
-                }
-                height: imgServer.height + 40
-
-                z: 4
-
-                color: "#eee"
-
-                Image {
-                    id: imgServer
-                    anchors {
-                        top: parent.top
-                        topMargin: 20
-                        horizontalCenter: parent.horizontalCenter
-                    }
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:/img/img/server.png"
-                }
-
-                // Status text
-                Text {
-                    id: txtStatus
-
-                    anchors {
-                        left: parent.left
-                        right: imgServer.left
-                        top: parent.top
-                        topMargin: 10
-                    }
-
-                    wrapMode: Text.WordWrap
-                    text: server.listen ? qsTr("Listening on: %1.\nOnline users: %2").arg(server.url).arg(userModel.count) : qsTr("Chocal Server is ready to start.")
-                }
-                // End status text
-
-
-            }
+            Header { id: header }
             // End header area
 
             // Users area
@@ -286,7 +72,7 @@ ApplicationWindow {
                 id: userView
 
                 anchors {
-                    top: rectHeader.bottom
+                    top: header.bottom
                     bottom: parent.bottom
                     left: parent.left
                 }
@@ -356,7 +142,7 @@ ApplicationWindow {
                 id: messageView
 
                 anchors {
-                    top: rectHeader.bottom
+                    top: header.bottom
                     bottom: parent.bottom
                     left: userView.right
                     right: settingView.left
@@ -378,7 +164,7 @@ ApplicationWindow {
                 id: settingView
 
                 anchors {
-                    top: rectHeader.bottom
+                    top: header.bottom
                     bottom: parent.bottom
                     right: parent.right
                 }
