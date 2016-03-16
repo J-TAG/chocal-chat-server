@@ -298,7 +298,8 @@ ApplicationWindow {
         userModel.append({
                              socket: socket,
                              name: json.name,
-                             user_key: user_key
+                             user_key: user_key,
+                             image: json.image
                          })
 
         updateUserKeysIndex()
@@ -396,11 +397,11 @@ ApplicationWindow {
         // Send message to all users
         appendInfoMessage(message)
         var json_string = JSON.stringify({
-                                                            type: "info",
-                                                            name: getUserName("SYSTEM"),
-                                                            message: message,
-                                                            image: ""
-                                                        })
+                                             type: "info",
+                                             name: getUserName("SYSTEM"),
+                                             message: message,
+                                             image: ""
+                                         })
 
         sendToAll(json_string)
     }
@@ -420,9 +421,7 @@ ApplicationWindow {
         appendImageMessage(sender, json)
         removeUserKey(json)
         var json_string = JSON.stringify(json)
-        for(var i = 0; i < userModel.count; ++i) {
-            userModel.get(i).socket.sendTextMessage(json_string);
-        }
+        sendToAll(json_string)
     }
 
     // Sends an accepted message to client to approve that client is successfuly registered in the system
@@ -432,7 +431,8 @@ ApplicationWindow {
             type: "accepted",
             name: getUserName("SYSTEM"),
             message: qsTr("You are joined to chat successfully."),
-            user_key: user_key
+            user_key: user_key,
+            online_users: getOnlineUsersBut(user_key)
         }
 
         var json_string = JSON.stringify(json)
@@ -495,6 +495,43 @@ ApplicationWindow {
     // Check to see if user key is valid or not
     function isValidUserKey(user_key) {
         return typeof user_keys_index[user_key] !== 'undefined'
+    }
+
+    // Returns an array that contains name and image of current online users
+    function getOnlineUsers() {
+        var users = [];
+
+        for(var i = 0; i < userModel.count; ++i) {
+            var user = userModel.get(i);
+
+            users.push({
+                           name: user.name,
+                           image: user.image
+                       })
+        }
+
+        return users
+    }
+
+    // Returns an array of current online users but the user whom his user_key is passed
+    function getOnlineUsersBut(user_key) {
+        var users = [];
+
+        for(var i = 0; i < userModel.count; ++i) {
+            var user = userModel.get(i);
+
+            // Skip requested user
+            if(user.user_key === user_key) {
+                continue;
+            }
+
+            users.push({
+                           name: user.name,
+                           image: user.image
+                       })
+        }
+
+        return users
     }
 
     // Disconnect all clients
