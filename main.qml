@@ -306,14 +306,32 @@ ApplicationWindow {
         // Navigate to newly added user
         userView.currentIndex = user_keys_index[user_key]
 
+        // Send update to all users
+        sendUpdateMessage({
+                              type: "update",
+                              update: "userJoined",
+                              name: json.name,
+                              image: json.image
+                          })
+
+
         return user_key
     }
 
     // Remove an existing client from server
     function removeClient(user_key) {
         if(isValidUserKey(user_key)) {
+
+            // Send update to all users
+            sendUpdateMessage({
+                                  type: "update",
+                                  update: "userLeft",
+                                  name: getUserName(user_key)
+                              })
+
             userModel.remove(user_keys_index[user_key])
             updateUserKeysIndex()
+
             return true
         }
 
@@ -355,6 +373,14 @@ ApplicationWindow {
         return false
     }
 
+    // Sends a plain text message to all users
+    function sendToAll(string) {
+        // Send message to all users
+        for(var i = 0; i < userModel.count; ++i) {
+            userModel.get(i).socket.sendTextMessage(string);
+        }
+    }
+
     // Sends a text message to all clients
     function sendTextMessage(sender, json) {
         // Send message to all users
@@ -362,12 +388,10 @@ ApplicationWindow {
         appendTextMessage(sender, json)
         removeUserKey(json)
         var json_string = JSON.stringify(json)
-        for(var i = 0; i < userModel.count; ++i) {
-            userModel.get(i).socket.sendTextMessage(json_string);
-        }
+        sendToAll(json_string)
     }
 
-    // Sends and info message to all clients
+    // Sends an info message to all clients
     function sendInfoMessage(message) {
         // Send message to all users
         appendInfoMessage(message)
@@ -378,9 +402,15 @@ ApplicationWindow {
                                                             image: ""
                                                         })
 
-        for(var i = 0; i < userModel.count; ++i) {
-            userModel.get(i).socket.sendTextMessage(json_string);
-        }
+        sendToAll(json_string)
+    }
+
+    // Sends an update message to all clients
+    function sendUpdateMessage(json) {
+        // Send message to all users
+        var json_string = JSON.stringify(json)
+
+        sendToAll(json_string)
     }
 
     // Sends an image message to all clients
