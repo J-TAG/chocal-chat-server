@@ -16,16 +16,17 @@ This repository contains the server application that is needed to handle clients
 
 ```javascript
 {
+    user_key: "",
     type: "",
     message: "",
     image: "",
-    user_key: ""
+    image_type: "" // If image is presented
 }
 ```
 
 `type` should be one of `plain`, `image` or `register`.
 `message` is the message that user wants to send to others.
-`image` is base64 encoded string of the image that user wants to send. This should have a value when using `type` of `image`, but in other cases it can be empty.
+`image` is base64 encoded string of the image that user wants to send. This should have a value when using `type` of `image`, but in other cases it can be empty. Note that when `type` is `image`, there should be an `image_type` field which includes MIME type of image.
 `user_key` is validation key of client to connect to server. This key will generate once user is first connected to server and will return back to client. In next messages client should provide this key.
 
 ## General Type Of A Message That Server Will Send To Clients:
@@ -36,13 +37,14 @@ This repository contains the server application that is needed to handle clients
     name: "",
     message: "",
     image: "",
+    image_type: "" // If image is presented
 }
 ```
 
-`type` will be one of `plain`, `image`, `info`, `update` or `error`.
+`type` will be one of `plain`, `image`, `info`, `update`, `accepted` or `error`.
 `name` is sender client name.
 `message` is the message that user wants to send to others.
-`image` is base64 encoded string of the image that user wants to send. This will have a value when using `type` of `image`, but in other cases it will be empty.
+`image` is base64 encoded string of the image that user wants to send. This will have a value when using `type` of `image`, but in other cases it will be empty. Note that when `type` is `image`, there should be an `image_type` field which includes MIME type of image.
 
 ## Message Types:
 
@@ -68,7 +70,9 @@ Clients can connect to server by sending below message to server:
 ```javascript
 {
     type: "register",
-    name: ""
+    name: "",
+    image: "", // Optional
+    image_type: "" // Required when image is presented
 }
 ```
 
@@ -79,11 +83,20 @@ If the `name` is taken currently the server will return an error message, otherw
     type: "accepted",
     name: "",
     message: "",
-    user_key: ""
+    user_key: "",
+    
+    online_clients: [
+        {
+            name: "",
+            image: "",
+            image_type""
+        },
+        ...
+    ]
 }
 ```
 
-At this point, client is connected to server successfuly and now is able to send messages using its `user_key`.
+At this point, client is connected to server successfuly and now is able to send messages using its `user_key`. Note that currently online clients are passed in `online_clients` field which is an array of objects that have `name`, `image` and `image_type` fields.
 
 ## How To Handle Updates?
 
@@ -98,7 +111,10 @@ When a new change is made, Chocal Server will send an `update` message to all cl
 }
 ```
 
-In the `update` field we have one of `userJoined` or `userLeft` values. If it is `userJoined` means a new user is joined to chat and his Avatar picture will be in the `image` field in base64 encode. If it has value of `userLeft` it means a user had left the chat and we can find his name in `name` field.
+In the `update` field we have one of `userJoined` or `userLeft` values.
+
+* If it is `userJoined` means a new user is joined to chat and his Avatar picture will be in the `image` field in base64 encode and MIME type of avatar will be in `image_type` field.
+* If it has value of `userLeft` it means a user had left the chat and we can find his name in `name` field.
 
 # Clients
 

@@ -299,7 +299,8 @@ ApplicationWindow {
                              socket: socket,
                              name: json.name,
                              user_key: user_key,
-                             image: json.image
+                             image: json.image,
+                             image_type: json.image_type
                          })
 
         updateUserKeysIndex()
@@ -312,7 +313,8 @@ ApplicationWindow {
                               type: "update",
                               update: "userJoined",
                               name: json.name,
-                              image: json.image
+                              image: json.image,
+                              image_type: json.image_type
                           })
 
 
@@ -506,7 +508,8 @@ ApplicationWindow {
 
             users.push({
                            name: user.name,
-                           image: user.image
+                           image: user.image,
+                           image_type: user.image_type
                        })
         }
 
@@ -527,7 +530,8 @@ ApplicationWindow {
 
             users.push({
                            name: user.name,
-                           image: user.image
+                           image: user.image,
+                           image_type: user.image_type
                        })
         }
 
