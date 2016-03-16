@@ -371,12 +371,12 @@ ApplicationWindow {
     function sendInfoMessage(message) {
         // Send message to all users
         appendInfoMessage(message)
-        var json_string = JSON.stringify(JSON.stringify({
+        var json_string = JSON.stringify({
                                                             type: "info",
                                                             name: getUserName("SYSTEM"),
                                                             message: message,
                                                             image: ""
-                                                        }))
+                                                        })
 
         for(var i = 0; i < userModel.count; ++i) {
             userModel.get(i).socket.sendTextMessage(json_string);
