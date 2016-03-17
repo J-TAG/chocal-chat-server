@@ -8,6 +8,7 @@
         <file>Header.qml</file>
         <file>Server.qml</file>
         <file>Toolbar.qml</file>
+        <file>Splash.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file>img/background.jpg</file>
@@ -21,6 +22,7 @@
         <file>img/server.png</file>
         <file>img/toolbar-collapse-expand.png</file>
         <file>img/puresoft-logo.png</file>
+        <file>img/chocal-logo-512.png</file>
     </qresource>
     <qresource prefix="/raw">
         <file>raw/new-message.wav</file>

@@ -7,6 +7,7 @@ ApplicationWindow {
     visible: true
     width: 960
     height: 640
+    title: qsTr("Chocal Server")
 
     property var user_keys_index: []
 
@@ -190,23 +191,7 @@ ApplicationWindow {
         // End main item
 
         // Splash item
-        front: Item {
-            id: back
-            anchors.fill: parent
-            Rectangle {
-                anchors.fill: parent
-                color: "purple"
-
-                // Title label
-                Label {
-                    anchors.centerIn: parent
-                    color: "#eee"
-                    font.pointSize: 72
-                    text: qsTr("Chocal Server")
-                }
-                // End title label
-            }
-        }
+        front: Splash {id: back}
         // End splash item
 
         // Transforms

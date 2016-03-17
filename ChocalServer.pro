@@ -35,3 +35,5 @@ QMAKE_TARGET_COMPANY = Pure Soft
 QMAKE_TARGET_PRODUCT = Chocal Server
 QMAKE_TARGET_DESCRIPTION = Chocal Chat server application
 QMAKE_TARGET_COPYRIGHT = CopyRight (C) 2012 - 2016 . AllRights Reserved by Pure Soft
+
+RC_ICONS = chocal.ico
