@@ -468,6 +468,7 @@ ApplicationWindow {
     function validateRecievedMessage(socket, json) {
         // Check to see user key is valid or not
         if(json.user_key === "SYSTEM" || !isValidUserKey(json.user_key)) {
+            sendSingleErrorMessage(socket, qsTr("User key '%1' is invalid.").arg(json.user_key))
             return false
         }
 

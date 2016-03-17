@@ -10,22 +10,28 @@ WebSocketServer {
 
             var json = JSON.parse(message)
 
-            // Check valid data
-            validateRecievedMessage(webSocket, json)
-
             // Normal message
             if(json.type === "plain") {
-                sendTextMessage(webSocket, json)
+                // Check valid data
+                if(validateRecievedMessage(webSocket, json)) {
+                    // Message is valid
+                    sendTextMessage(webSocket, json)
+                }
             }
 
             // Image message
             if(json.type === "image") {
-                sendImageMessage(webSocket, json)
+                // Check valid data
+                if(validateRecievedMessage(webSocket, json)) {
+                    // Message is valid
+                    sendImageMessage(webSocket, json)
+                }
             }
 
             // Register message
             if(json.type === "register") {
                 // First message after socket connection
+                // Note that we can't validate register message because user has not any user_key yet
 
                 // If name is duplicate don't add new user
                 var user_key = newClient(webSocket, json)
