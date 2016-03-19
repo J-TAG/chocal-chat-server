@@ -310,15 +310,18 @@ ApplicationWindow {
     function removeClient(user_key) {
         if(isValidUserKey(user_key)) {
 
+            // Get user name before removing him
+            var user_name = getUserName(user_key)
+
+            userModel.remove(user_keys_index[user_key])
+            updateUserKeysIndex()
+
             // Send update to all users
             sendUpdateMessage({
                                   type: "update",
                                   update: "userLeft",
-                                  name: getUserName(user_key)
+                                  name: user_name
                               })
-
-            userModel.remove(user_keys_index[user_key])
-            updateUserKeysIndex()
 
             return true
         }
