@@ -4,6 +4,8 @@ Chocal Chat is a cross platform application that can run in a local network.
 
 This repository contains the server application that is needed to handle clients.
 
+![Chocal Chat](chocal-server.png)
+
 # Install
 
 1. Chocal Chat server application is based on Qt Quick, so you need to install Qt development tools. It is tested on Fedora 23 but not on Mac or Windows. Although it should be run there without any problems.
