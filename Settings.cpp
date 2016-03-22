@@ -20,6 +20,12 @@ bool Settings::getBool(const QString &key, bool defaultValue)
 	return this->settings.value(key, defaultValue).toBool();
 }
 
+QLocale Settings::getLocale(const QString &key, QString defaultValue)
+{
+	QString str_locale(this->settings.value(key, defaultValue).toString());
+	return QLocale(str_locale);
+}
+
 QString Settings::getString(const QString &key, const QString &defaultValue)
 {
 	return this->settings.value(key, defaultValue).toString();

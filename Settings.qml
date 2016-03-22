@@ -106,6 +106,31 @@ Rectangle {
         // End info notification field
 
 
+        // Language field
+        Row {
+            width: parent.width
+
+            // Description text
+            Text{
+                text:qsTr("Language:")
+                width: parent.width / 2
+                wrapMode: Text.WordWrap
+            }
+
+            // Input combo
+            ComboBox {
+                id: comboLanguage
+                currentIndex: settings.getInt("localeIndex")
+                model: ListModel {
+                    id: languageItems
+                    ListElement { text: "English (United States)"; locale: "en_US" }
+                    ListElement { text: "پارسی"; locale: "fa_IR" }
+                }
+                width: parent.width / 2
+            }
+        }
+        // End info notification field
+
         // Bottom buttons
         Row {
             spacing: 10
@@ -124,6 +149,8 @@ Rectangle {
                     settings.setValue("port", txtPort.text)
                     settings.setValue("newMessageSound", switchMessageNotification.checked)
                     settings.setValue("infoSound", switchInfoNotification.checked)
+                    settings.setValue("locale", languageItems.get(comboLanguage.currentIndex).locale)
+                    settings.setValue("localeIndex", comboLanguage.currentIndex)
                     appendInfoMessage(qsTr("Settings are successfuly saved. You must restart Chocal Server for settings to take effect"))
                     rect.state = "hide"
                 }

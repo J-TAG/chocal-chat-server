@@ -3,6 +3,9 @@ TEMPLATE = app
 QT += qml quick
 CONFIG += c++11
 
+## Translations
+TRANSLATIONS = translations/translate-fa.ts
+
 SOURCES += main.cpp \
     FileIO.cpp \
     Settings.cpp
@@ -18,6 +21,12 @@ include(deployment.pri)
 HEADERS += \
     FileIO.hpp \
     Settings.hpp
+
+# Allow lupdate to search all QML and JS files for translations
+lupdate_only {
+SOURCES = *.qml \
+	  *.js
+}
 
 VERSION = 1.0.0
 VERSION_MAJOR = 1

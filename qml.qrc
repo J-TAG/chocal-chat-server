@@ -28,4 +28,7 @@
         <file>raw/new-message.wav</file>
         <file>raw/info.wav</file>
     </qresource>
+    <qresource prefix="/translations">
+        <file>translations/translate-fa.qm</file>
+    </qresource>
 </RCC>

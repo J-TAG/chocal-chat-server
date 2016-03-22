@@ -2,8 +2,7 @@
 #define SETTINGS_HPP
 
 #include <QSettings>
-
-
+#include <QLocale>
 
 class Settings : public QObject
 {
@@ -18,6 +17,7 @@ public slots:
 	QString getString(const QString& key, const QString& defaultValue=0);
 	int getInt(const QString& key, int defaultValue=0);
 	bool getBool(const QString& key, bool defaultValue=false);
+	QLocale getLocale(const QString& key, QString defaultValue=QStringLiteral("en_US"));
 
 protected:
 	QSettings settings;

@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QTranslator>
 #include "FileIO.hpp"
 #include "Settings.hpp"
 
@@ -18,6 +19,18 @@ int main(int argc, char *argv[])
 	// Helper classes
 	FileIO fileIO;
 	Settings settings;
+
+	// Get application locale
+	QLocale locale = settings.getLocale(QStringLiteral("locale"));
+	QLocale::setDefault(locale);
+
+	// Load translate texts for current language
+	QTranslator translator;
+	// Look up e.g. :/translations/translations/translate-fa.qm
+	if (translator.load(locale, QLatin1String("translate"), QLatin1String("-"),
+						QLatin1String(":/translations/translations"))){
+		app.installTranslator(&translator);
+	}
 
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty(QStringLiteral("fileio"), &fileIO);
