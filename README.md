@@ -4,7 +4,7 @@ Chocal Chat is a cross platform application that can run in a local network.
 
 This repository contains the server application that is needed to handle clients.
 
-![Chocal Server](blob:https%3A//drive.google.com/5d274fbe-2caf-44df-b986-9d3e1da85777)
+![Chocal Server](https://puresoftware.org/images/chocal-chat/github/chocal-server.png)
 
 # Install
 
