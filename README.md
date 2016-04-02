@@ -124,6 +124,7 @@ In the `update` field we have one of `userJoined` or `userLeft` values.
 
 # Clients
 
-I have planned to create several type of clients for Chocal Server. But in the meantime I'm working on web client. Although by the roadmap we should have a desktop client that can be run on Mac, Linux and Windows and also an Android app.
+I have planned to create several type of clients for Chocal Server. But in the meantime we have only the web client. Although by the roadmap we should have a desktop client that can be run on Mac, Linux and Windows and also an Android app. At this point I'm working on the Android client.
 
 * Chocal Chat Web Client : https://github.com/J-TAG/chocal-chat-web
+* Chocal Chat Android Client : https://github.com/J-TAG/chocal-chat-android
