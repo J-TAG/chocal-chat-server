@@ -1,7 +1,6 @@
 #include "FileIO.hpp"
 #include <QCryptographicHash>
 #include <QDebug>
-#include <QUrl>
 #include <QUuid>
 
 FileIO::FileIO()
@@ -69,6 +68,11 @@ QString FileIO::getAvatarPath(const QString &name)
 	}
 
 	return m_tmpAvatarDir.path().append("/").append(name);
+}
+
+QUrl FileIO::getAvatarUrl(const QString &name)
+{
+	return QUrl::fromLocalFile(this->getAvatarPath(name));
 }
 
 QString FileIO::getImagePath(const QString &name)

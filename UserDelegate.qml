@@ -34,7 +34,7 @@ Rectangle {
                 x: 10
 
                 fillMode: Image.PreserveAspectCrop
-                source: main.getAvatar(user_key)
+                source: main.getAvatar(name)
 
                 // Circle effect
                 layer.enabled: true

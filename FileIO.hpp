@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QTemporaryDir>
+#include <QUrl>
 
 class FileIO : public QObject
 {
@@ -19,6 +20,7 @@ public slots:
 	bool setUserAvatar(const QString& name, const QString& data);
 	bool hasAvatar(const QString& name);
 	QString getAvatarPath(const QString& name=0);
+	QUrl getAvatarUrl(const QString& name);
 	QString getImagePath(const QString& name);
 	QString decodeImage(const QString& data);
 	QString getNewUserKey();

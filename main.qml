@@ -279,6 +279,11 @@ ApplicationWindow {
             return false
         }
 
+        // Set user Avatar
+        if(typeof json.image !== "undefined") {
+            fileio.setUserAvatar(json.name, json.image);
+        }
+
         // Everything is ok, so add user
         userModel.append({
                              socket: socket,
@@ -471,7 +476,7 @@ ApplicationWindow {
             return "qrc:/img/img/no-avatar.png"
         }
 
-        return "file://" + fileio.getAvatarPath(name);
+        return fileio.getAvatarUrl(name);
     }
 
     // Get user name by its user key
