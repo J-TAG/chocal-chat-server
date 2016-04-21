@@ -91,7 +91,7 @@ If the `name` is taken currently the server will return an error message, otherw
     message: "",
     user_key: "",
     
-    online_clients: [
+    online_users: [
         {
             name: "",
             image: "",
@@ -102,7 +102,7 @@ If the `name` is taken currently the server will return an error message, otherw
 }
 ```
 
-At this point, client is connected to server successfuly and now is able to send messages using its `user_key`. Note that currently online clients are passed in `online_clients` field which is an array of objects that have `name`, `image` and `image_type` fields.
+At this point, client is connected to server successfuly and now is able to send messages using its `user_key`. Note that currently online clients are passed in `online_users` field which is an array of objects that have `name`, `image` and `image_type` fields.
 
 ## How To Handle Updates?
 
