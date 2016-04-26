@@ -14,7 +14,7 @@ This repository contains the server application that is needed to handle clients
 
 3. Clone repository from github and open `ChocalServer.pro` in Qt Creator.
 
-4. Use `lrelease` to generate translation `qm` files. For example if Qt bin directory is in your PATH enviroment variable you can run `lrelease-qt5 ChocalServer.pro` or if it is not you can run `path/to/qt/bin/lrelease ChocalServer.pro` or in a Windows enviromet run `C:\Qt\Qt5.6.0\5.6\msvc2015_64\bin\lrelease.exe ChocalServer.pro`. Note that because `qm` files are supposed to be bundled in a `.qrc` file, so you SHOULD do this step, otherwise the build operation will fail.
+4. Use `lrelease` to generate translation `qm` files. For example if Qt bin directory is in your PATH environment variable you can run `lrelease-qt5 ChocalServer.pro` or if it is not you can run `path/to/qt/bin/lrelease ChocalServer.pro` or in a Windows environmet run `C:\Qt\Qt5.6.0\5.6\msvc2015_64\bin\lrelease.exe ChocalServer.pro`. Note that because `qm` files are supposed to be bundled in a `.qrc` file, so you SHOULD do this step, otherwise the build operation will fail.
 
 # Standards
 
