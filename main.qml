@@ -281,7 +281,7 @@ ApplicationWindow {
 
         // Set user Avatar
         if(typeof json.image !== "undefined") {
-            fileio.setUserAvatar(json.name, json.image);
+            fileio.setUserAvatar(user_key, json.image);
         }
 
         // Everything is ok, so add user
@@ -468,15 +468,15 @@ ApplicationWindow {
         return true
     }
 
-    // Get avatar path by user name
-    function getAvatar(name) {
+    // Get avatar path by user key
+    function getAvatar(user_key) {
 
-        if(name === undefined || name === null || name === ""
-                || name === getUserName("SYSTEM") || !fileio.hasAvatar(name)) {
+        if(typeof user_key === "undefined" || user_key === null || user_key === ""
+                || !fileio.hasAvatar(user_key)) {
             return "qrc:/img/img/no-avatar.png"
         }
 
-        return fileio.getAvatarUrl(name);
+        return fileio.getAvatarUrl(user_key);
     }
 
     // Get user name by its user key
@@ -486,6 +486,23 @@ ApplicationWindow {
         }
 
         return userModel.get(user_keys_index[user_key]).name
+    }
+
+    // Get user key by its name
+    function getUserKeyByName(name) {
+        if(name === "Server") {
+            return qsTr("SYSTEM")
+        }
+
+        for(var i = 0; i < userModel.count; ++i) {
+            var user = userModel.get(i);
+
+            if(user.name === name) {
+                return user.user_key
+            }
+        }
+
+        return false
     }
 
     // Check to see if user key is valid or not

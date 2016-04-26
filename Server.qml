@@ -87,7 +87,9 @@ WebSocketServer {
     }
 
     onErrorStringChanged: {
-        appendInfoMessage(qsTr("Server error: %1").arg(errorString))
+        if(errorString !== "") {
+            appendInfoMessage(qsTr("Server error: %1").arg(errorString))
+        }
     }
 
 }

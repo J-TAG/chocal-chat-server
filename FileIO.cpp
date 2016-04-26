@@ -1,7 +1,4 @@
 #include "FileIO.hpp"
-#include <QCryptographicHash>
-#include <QDebug>
-#include <QUuid>
 
 FileIO::FileIO()
 {
@@ -41,38 +38,48 @@ bool FileIO::decodeAndWrite(const QString& source, const QString& data)
 	return true;
 }
 
-bool FileIO::setUserAvatar(const QString &name, const QString &data)
+bool FileIO::setUserAvatar(const QString &user_key, const QString &data)
 {
 	if(!m_tmpAvatarDir.isValid()) {
 		return false;
 	}
 
-	QString avatar_path = this->getAvatarPath(name);
+    QImage image;
+    QByteArray dataBytes, resultBytes;
+    QBuffer buffer(&resultBytes, this);
+    QString avatar_path = this->getAvatarPath(user_key);
 
-	return this->decodeAndWrite(avatar_path, data);
+    dataBytes.append(data);
+    // Resize image
+    image.loadFromData(QByteArray::fromBase64(dataBytes));
+    QImage(image.scaled(128, 128, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)).save(&buffer, "JPG");
+    buffer.open(QIODevice::WriteOnly);
+
+    return this->decodeAndWrite(avatar_path, resultBytes.toBase64());
 }
 
-bool FileIO::hasAvatar(const QString &name)
+bool FileIO::hasAvatar(const QString &user_key)
 {
-	return QFile::exists(this->getAvatarPath(name));
+	return QFile::exists(this->getAvatarPath(user_key));
 }
 
-QString FileIO::getAvatarPath(const QString &name)
+QString FileIO::getAvatarPath(const QString &user_key)
 {
 	if(!m_tmpAvatarDir.isValid()) {
 		return 0;
 	}
 
-	if(name == 0) {
+    if(user_key == 0) {
 		return this->m_tmpAvatarDir.path();
 	}
 
-	return m_tmpAvatarDir.path().append("/").append(name);
+    // Note that FileIO::setUserAvatar() method will generate JPG files
+    return m_tmpAvatarDir.path().append("/").append(user_key).append(".jpg");
 }
 
-QUrl FileIO::getAvatarUrl(const QString &name)
+QUrl FileIO::getAvatarUrl(const QString &user_key)
 {
-	return QUrl::fromLocalFile(this->getAvatarPath(name));
+	return QUrl::fromLocalFile(this->getAvatarPath(user_key));
 }
 
 QString FileIO::getImagePath(const QString &name)

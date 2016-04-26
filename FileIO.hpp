@@ -6,6 +6,11 @@
 #include <QTextStream>
 #include <QTemporaryDir>
 #include <QUrl>
+#include <QCryptographicHash>
+#include <QImage>
+#include <QUuid>
+#include <QBuffer>
+#include <QDebug>
 
 class FileIO : public QObject
 {
@@ -17,10 +22,10 @@ public:
 public slots:
 	bool write(const QString& source, const QString& data);
 	bool decodeAndWrite(const QString& source, const QString& data);
-	bool setUserAvatar(const QString& name, const QString& data);
-	bool hasAvatar(const QString& name);
-	QString getAvatarPath(const QString& name=0);
-	QUrl getAvatarUrl(const QString& name);
+	bool setUserAvatar(const QString& user_key, const QString& data);
+    bool hasAvatar(const QString& user_key);
+	QString getAvatarPath(const QString& user_key=0);
+    QUrl getAvatarUrl(const QString& user_key);
 	QString getImagePath(const QString& name);
 	QString decodeImage(const QString& data);
 	QString getNewUserKey();
