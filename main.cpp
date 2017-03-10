@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 #include <QQmlContext>
 #include <QTranslator>
 #include "FileIO.hpp"
@@ -15,6 +16,9 @@ int main(int argc, char *argv[])
 	QCoreApplication::setApplicationName(QStringLiteral("Chocal Server"));
 	// Set Version
 	QCoreApplication::setApplicationVersion(VERSION);
+
+	// Set Material style
+	QQuickStyle::setStyle(QStringLiteral("Material"));
 
 	// Helper classes
 	FileIO fileIO;

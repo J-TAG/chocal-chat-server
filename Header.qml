@@ -1,8 +1,9 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.0
+import QtQuick.Controls.Material 2.0
 
-Rectangle {
-    id: rect
+ToolBar {
+    id: toolbar
 
     anchors {
         top: parent.top
@@ -13,7 +14,7 @@ Rectangle {
 
     z: 4
 
-    color: "#eee"
+    Material.primary: Material.background
     state: "show"
 
     Image {
@@ -58,7 +59,7 @@ Rectangle {
             name: "show"
             // Move panel down
             AnchorChanges {
-                target: rect
+                target: toolbar
                 anchors.top: parent.top
             }
         },
@@ -73,7 +74,7 @@ Rectangle {
             }
             // Make height of panel a little higher that status text height
             PropertyChanges {
-                target: rect
+                target: toolbar
                 height: txtStatus.height + 20
             }
         }

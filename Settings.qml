@@ -1,8 +1,8 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.0
 
-Rectangle {
-    id: rect
+Pane {
+    id: pane
 
     // Main Layout
     Column {
@@ -121,6 +121,7 @@ Rectangle {
             ComboBox {
                 id: comboLanguage
                 currentIndex: settings.getInt("localeIndex")
+                textRole: "text"
                 model: ListModel {
                     id: languageItems
                     ListElement { text: "English (United States)"; locale: "en_US" }
@@ -152,7 +153,7 @@ Rectangle {
                     settings.setValue("locale", languageItems.get(comboLanguage.currentIndex).locale)
                     settings.setValue("localeIndex", comboLanguage.currentIndex)
                     appendInfoMessage(qsTr("Settings are successfuly saved. You must restart Chocal Server for settings to take effect"))
-                    rect.state = "hide"
+                    pane.state = "hide"
                 }
             }
 
@@ -161,7 +162,7 @@ Rectangle {
                 text: qsTr("Cancel")
 
                 onClicked: {
-                    rect.state = "hide"
+                    pane.state = "hide"
                 }
             }
 
@@ -188,8 +189,8 @@ Rectangle {
         State {
             name: "show"
             AnchorChanges {
-                target: rect
-                anchors.right: rect.parent.right
+                target: pane
+                anchors.right: pane.parent.right
                 anchors.left: undefined
             }
         },
@@ -197,9 +198,9 @@ Rectangle {
         State {
             name: "hide"
             AnchorChanges {
-                target: rect
+                target: pane
                 anchors.right: undefined
-                anchors.left: rect.parent.right
+                anchors.left: pane.parent.right
             }
         }
     ]

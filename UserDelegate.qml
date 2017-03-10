@@ -1,6 +1,7 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.0
 import QtGraphicalEffects 1.0
+import QtQuick.Controls.Material 2.0
 
 // Container rectangle
 Rectangle {
@@ -9,14 +10,14 @@ Rectangle {
     height: layout.height
     width: userView.width
 
-    color: "#eee"
+    color: Material.background
 
 
     Row {
         id: layout
         spacing: 20
 
-        height: Math.max(itmText.height, itmImage.height) + 20
+        height: Math.max(itmText.height, itmImage.height, columnDel.height) + 20
 
         // Avatar item
         Item {
@@ -25,12 +26,14 @@ Rectangle {
             height: 60
             width: 70
 
+            anchors.verticalCenter: parent.verticalCenter
+
             // Avatar image
             Image {
                 id: imgAvatar
                 height: 60
                 width: 60
-                y: 5
+                y: 0
                 x: 10
 
                 fillMode: Image.PreserveAspectCrop
@@ -62,10 +65,12 @@ Rectangle {
             height: txtName.height + txtStatus.height + 20
             width: txtName.width
 
+            anchors.verticalCenter: parent.verticalCenter
+
             // User name
             Text {
                 id: txtName
-                y: 15
+                y: 5
                 width: userView.width - 90
                 text: name
                 color: "#ea8627"
@@ -109,11 +114,13 @@ Rectangle {
         anchors.fill: parent
 
         state: "hide"
-        color: "#eee"
+        color: Material.background
 
         // Delete question layout
         Column {
-            anchors.fill: parent
+            id: columnDel
+            width: parent.width
+            anchors.verticalCenter: parent.verticalCenter
             spacing: 10
 
             // Delete question text

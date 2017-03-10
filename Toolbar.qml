@@ -1,15 +1,21 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.0
+import QtQuick.Controls.Material 2.0
 
 ToolBar {
+    Material.primary: "white"
     Row {
         anchors.fill: parent
 
         // Start button
         ToolButton {
             text: qsTr("Start")
-            tooltip: qsTr("Start Chocal Server")
-            iconSource: "qrc:/img/img/toolbar-start.png"
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Start Chocal Server")
+            contentItem: Image {
+                source: "qrc:/img/img/toolbar-start.png"
+            }
+
 
             onClicked: {
                 var host = settings.getString("ip")
@@ -35,8 +41,11 @@ ToolBar {
         // Stop button
         ToolButton {
             text: qsTr("Stop")
-            tooltip: qsTr("Stop Chocal Server")
-            iconSource: "qrc:/img/img/toolbar-stop.png"
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Stop Chocal Server")
+            contentItem: Image {
+                source: "qrc:/img/img/toolbar-stop.png"
+            }
 
             onClicked: {
                 sendInfoMessage(qsTr("Server stoped by admin"))
@@ -49,8 +58,11 @@ ToolBar {
         // Shutdown button
         ToolButton {
             text: qsTr("Shutdown")
-            tooltip: qsTr("Shutdown Chocal Server")
-            iconSource: "qrc:/img/img/toolbar-shutdown.png"
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Shutdown Chocal Server")
+            contentItem: Image {
+                source: "qrc:/img/img/toolbar-shutdown.png"
+            }
 
             onClicked: {
                 server.listen = false
@@ -62,8 +74,12 @@ ToolBar {
         // Expand/Collapse button
         ToolButton {
             text: header.state === "show" ? qsTr("Collapse") : qsTr("Expand")
-            tooltip: header.state === "show" ? qsTr("Collapse header bar") : qsTr("Expand header bar")
-            iconSource: "qrc:/img/img/toolbar-collapse-expand.png"
+            ToolTip.visible: hovered
+            ToolTip.text: header.state === "show" ? qsTr("Collapse header bar") : qsTr("Expand header bar")
+            contentItem: Image {
+                source: "qrc:/img/img/toolbar-collapse-expand.png"
+            }
+
 
             onClicked: {
                 header.state = header.state === "show" ? "hide" : "show"
@@ -73,8 +89,11 @@ ToolBar {
         // Settings button
         ToolButton {
             text: qsTr("Settings")
-            tooltip: qsTr("Server settings")
-            iconSource: "qrc:/img/img/toolbar-settings.png"
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Server settings")
+            contentItem: Image {
+                source: "qrc:/img/img/toolbar-settings.png"
+            }
 
             onClicked: {
                 settingView.state = settingView.state === "show" ? "hide" : "show"
@@ -84,8 +103,11 @@ ToolBar {
         // About button
         ToolButton {
             text: qsTr("About")
-            tooltip: qsTr("About application")
-            iconSource: "qrc:/img/img/toolbar-about.png"
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("About application")
+            contentItem: Image {
+                source: "qrc:/img/img/toolbar-about.png"
+            }
 
             onClicked: {
                 if(about.state === "show") {
